@@ -145,4 +145,12 @@ STATIC_URL = '/static/'
 GRAPPELLI_ADMIN_TITLE = "Sonical"
 
 REST_FRAMEWORK = {
+    "DEFAULT_FILTER_BACKENDS": (
+        "rest_framework.filters.DjangoFilterBackend",
+        "rest_framework.filters.OrderingFilter",
+        "rest_framework.filters.SearchFilter",
+    ),
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": 25,
+    "TEST_REQUEST_DEFAULT_FORMAT": "JSON",
 }
