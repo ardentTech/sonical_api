@@ -18,7 +18,6 @@ class Driver(Creatable, Modifiable):
         null=True)
     model = models.CharField(
         _("Model"),
-        blank=True,
         max_length=128)
     nominal_impedance = models.IntegerField(
         _("Nominal Impedance (Ohms)"),

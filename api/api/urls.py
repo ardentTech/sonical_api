@@ -16,7 +16,18 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 
+from rest_framework import routers
+
+from drivers.views import DriverViewSet
+
+router = routers.DefaultRouter()
+router.register(
+    r"drivers",
+    DriverViewSet,
+    base_name="driver")
+
 urlpatterns = [
+    url(r"^v1/", include(router.urls, namespace="api")),
     url(r"^grappelli/", include("grappelli.urls")),
     url(r'^admin/', admin.site.urls),
 ]

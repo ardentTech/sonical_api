@@ -1,3 +1,14 @@
-from django.shortcuts import render
+from rest_framework import mixins
+from rest_framework.viewsets import GenericViewSet
 
-# Create your views here.
+from .models import Driver
+from .serializers import DriverSerializer
+
+
+class DriverViewSet(mixins.ListModelMixin, GenericViewSet):
+
+    filter_class = None
+    ordering_fields = ()
+    queryset = Driver.objects.all()
+    search_fields = ("model",)
+    serializer_class = DriverSerializer

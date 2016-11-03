@@ -10,14 +10,16 @@ class DriverSerializer(serializers.ModelSerializer):
 
     class Meta:
         fields = (
+            "created",
             "diameter",
             "id",
             "manufacturer",
             "max_power",
             "model",
+            "modified",
             "nominal_impedance",
             "resonant_frequency",
             "rms_power",
             "sensitivity",)
         model = Driver
-        read_only_fields = ("id",)
+        read_only_fields = ("created", "id", "modified",)

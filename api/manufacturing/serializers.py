@@ -6,14 +6,14 @@ from .models import Manufacturer, Material
 class ManufacturerSerializer(serializers.ModelSerializer):
 
     class Meta:
-        fields = ("id", "name",)
+        fields = ("created", "id", "modified", "name",)
         model = Manufacturer
-        read_only_fields = ("id",)
+        read_only_fields = ("created", "id", "modified",)
 
 
 class MaterialSerializer(serializers.ModelSerializer):
 
     class Meta:
-        fields = ("id", "name",)
+        fields = ("created", "id", "modified", "name",)
         model = Material
-        read_only_fields = ("id",)
+        read_only_fields = ("created", "id", "modified",)
