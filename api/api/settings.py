@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     # app
     "drivers",
     "manufacturing",
+    "utils",
 ]
 
 MIDDLEWARE = [

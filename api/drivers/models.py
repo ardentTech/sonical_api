@@ -1,8 +1,10 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from utils.models import Creatable, Modifiable
 
-class Driver(models.Model):
+
+class Driver(Creatable, Modifiable):
 
     diameter = models.FloatField(
         _("Diameter (Millimeters)"),
