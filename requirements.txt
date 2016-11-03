@@ -1,0 +1,10 @@
+Django==1.10.2
+django-cors-headers==1.2.2
+django-filter==0.15.3
+django-grappelli==2.8.2
+djangorestframework==3.5.2
+factory-boy==2.7.0
+fake-factory==0.7.2
+psycopg2==2.6.2
+python-dateutil==2.5.3
+six==1.10.0
