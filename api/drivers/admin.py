@@ -8,6 +8,7 @@ class DriverAdmin(admin.ModelAdmin):
         (None, {
             "fields": (
                 "diameter",
+                "in_production",
                 "manufacturer",
                 "max_power",
                 "model",
@@ -30,7 +31,7 @@ class DriverAdmin(admin.ModelAdmin):
         "created",
         "modified",
     )
-    list_filter = ("manufacturer",)
+    list_filter = ("in_production", "manufacturer",)
     readonly_fields = ("created", "id", "modified",)
     search_fields = ("model",)
 

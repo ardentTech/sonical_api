@@ -8,6 +8,7 @@ class ManufacturerAdmin(admin.ModelAdmin):
         (None, {
             "fields": (
                 "name",
+                "website",
             )
         }),
         ("Meta", {

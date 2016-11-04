@@ -13,6 +13,7 @@ class DriverSerializer(serializers.ModelSerializer):
             "created",
             "diameter",
             "id",
+            "in_production",
             "manufacturer",
             "max_power",
             "model",

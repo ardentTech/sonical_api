@@ -4,12 +4,16 @@ from django.utils.translation import ugettext_lazy as _
 from utils.models import Creatable, Modifiable
 
 
+# @todo need concept of version?
 class Driver(Creatable, Modifiable):
 
     diameter = models.FloatField(
         _("Diameter (Millimeters)"),
         blank=True,
         null=True)
+    in_production = models.BooleanField(
+        _("In Production"),
+        default=True)
     manufacturer = models.ForeignKey(
         "manufacturing.Manufacturer")
     max_power = models.IntegerField(
@@ -41,3 +45,7 @@ class Driver(Creatable, Modifiable):
 
     def __str__(self):
         return "{0} {1}".format(self.manufacturer.name, self.model)
+
+    def validate_unique(self, exclude=None):
+        # @todo validate model + manufacturer.name? part number?
+        pass

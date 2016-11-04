@@ -8,7 +8,11 @@ class Manufacturer(Creatable, Modifiable):
 
     name = models.CharField(
         _("Name"),
-        max_length=128)
+        max_length=128,
+        unique=True)
+    website = models.URLField(
+        _("website"),
+        blank=True)
 
     class Meta:
         ordering = ["id"]
@@ -21,7 +25,8 @@ class Material(Creatable, Modifiable):
 
     name = models.CharField(
         _("Name"),
-        max_length=128)
+        max_length=128,
+        unique=True)
 
     class Meta:
         ordering = ["id"]
