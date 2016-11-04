@@ -17,7 +17,7 @@ build() {
   if makemigrations; then
     if migrate; then
       if test; then
-        if populate; then
+        if seed; then
           if createsuperuser; then
             if runserver; then
               echo
@@ -51,11 +51,11 @@ migrate() {
   cd ${PROJ} && ${PM} migrate ${SETTINGS}
 }
 
-populate() {
+seed() {
   echo
-  echo "########### POPULATE ###########"
+  echo "########### SEED ###########"
 
-  cd ${PROJ} && ${PM} populate ${SETTINGS}
+  cd ${PROJ} && ${PM} seed ${SETTINGS}
 }
 
 runserver() {
