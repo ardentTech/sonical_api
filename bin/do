@@ -1,0 +1,79 @@
+#!/bin/bash
+
+DB_NAME="sonical"
+PM="python manage.py"
+PROJ="$(pwd)/api"
+SETTINGS="--settings=api.settings.dev"
+
+# @todo throw an error when no arg is passed in
+
+build() {
+  echo
+  echo "########### BUILD ###########"
+
+  dropdb ${DB_NAME}
+  createdb ${DB_NAME}
+
+  if makemigrations; then
+    if migrate; then
+      if test; then
+        if populate; then
+          if createsuperuser; then
+            if runserver; then
+              echo
+            fi
+          fi
+        fi
+      fi
+    fi
+  fi
+
+}
+
+createsuperuser() {
+  echo
+  echo "########### CREATE SUPERUSER ###########"
+
+  cd ${PROJ} && ${PM} createsuperuser ${SETTINGS}
+}
+
+makemigrations() {
+  echo
+  echo "########### MAKE MIGRATIONS ###########"
+
+  cd ${PROJ} && ${PM} makemigrations ${SETTINGS}
+}
+
+migrate() {
+  echo
+  echo "########### MIGRATE ###########"
+
+  cd ${PROJ} && ${PM} migrate ${SETTINGS}
+}
+
+populate() {
+  echo
+  echo "########### POPULATE ###########"
+
+  cd ${PROJ} && ${PM} populate ${SETTINGS}
+}
+
+runserver() {
+  echo
+  echo "########### RUN SERVER ###########"
+
+  cd ${PROJ} && ${PM} runserver ${SETTINGS}
+}
+
+test() {
+  echo
+  echo "########### TEST ###########"
+
+  cd ${PROJ} && ${PM} test ${SETTINGS}
+}
+
+source ${HOME}/.venv/sonical/bin/activate
+${1}
+echo "ALL DONE!"
+
+exit 0
