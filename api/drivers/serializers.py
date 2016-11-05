@@ -11,13 +11,13 @@ class DriverSerializer(serializers.ModelSerializer):
     class Meta:
         fields = (
             "created",
-            "diameter",
             "id",
             "in_production",
             "manufacturer",
             "max_power",
             "model",
             "modified",
+            "nominal_diameter",
             "nominal_impedance",
             "resonant_frequency",
             "rms_power",

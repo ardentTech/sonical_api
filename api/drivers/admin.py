@@ -7,11 +7,11 @@ class DriverAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
             "fields": (
-                "diameter",
                 "in_production",
                 "manufacturer",
                 "max_power",
                 "model",
+                "nominal_diameter",
                 "nominal_impedance",
                 "resonant_frequency",
                 "rms_power",

@@ -7,8 +7,8 @@ from utils.models import Creatable, Modifiable
 # @todo need concept of version?
 class Driver(Creatable, Modifiable):
 
-    diameter = models.FloatField(
-        _("Diameter (Millimeters)"),
+    nominal_diameter = models.FloatField(
+        _("Nominal Diameter (Inches)"),
         blank=True,
         null=True)
     in_production = models.BooleanField(
@@ -39,6 +39,32 @@ class Driver(Creatable, Modifiable):
         _("Sensitivity (Decibels)"),
         blank=True,
         null=True)
+#    hifi_or_pa (application?)
+#    frequency_response int -> int (Hz)
+#    dc_resistance float (ohms)
+#    voice_coil_inductance float (mH)
+#    mechanical_q float
+#    electromagnetic_q float
+#    total_q float
+#    compliance_equivalent_volume float (ft**3)
+#    mechanical_compliance_of_suspension float (mm/N)
+#    bl_product float (Tm)
+#    diaphragm_mass float (g)
+#    maximum_linear_excursion float (mm)
+#    surface_area_of_cone float (cm**2)
+#    cone_material
+#    surround_material
+#    voice_coil_wire_material
+#    voice_coil_former
+#    basket_frame_material
+#    magnet_material
+#    part_number
+#    category
+#    overall_outside_diameter
+#    baffle_cutout_diameter
+#    depth
+#    bolt_circle_diameter
+#    mounting_holes_count
 
     class Meta:
         ordering = ["model"]
