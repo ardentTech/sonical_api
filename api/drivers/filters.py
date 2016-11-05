@@ -1,9 +1,11 @@
 import django_filters
 
+from .models import Driver
+
 
 class DriverFilter(django_filters.FilterSet):
 
-    manufacturer = django_filters.CharFilter(name="manufactuer__name")
+    manufacturer = django_filters.CharFilter(name="manufacturer__name")
 
     class Meta:
         fields = [
@@ -17,4 +19,4 @@ class DriverFilter(django_filters.FilterSet):
             "rms_power",
             "sensitivity",
         ]
-        model = "drivers.Driver"
+        model = Driver
