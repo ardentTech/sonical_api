@@ -7,10 +7,6 @@ from utils.models import Creatable, Modifiable
 # @todo need concept of version?
 class Driver(Creatable, Modifiable):
 
-    nominal_diameter = models.FloatField(
-        _("Nominal Diameter (Inches)"),
-        blank=True,
-        null=True)
     in_production = models.BooleanField(
         _("In Production"),
         default=True)
@@ -23,6 +19,10 @@ class Driver(Creatable, Modifiable):
     model = models.CharField(
         _("Model"),
         max_length=128)
+    nominal_diameter = models.FloatField(
+        _("Nominal Diameter (Inches)"),
+        blank=True,
+        null=True)
     nominal_impedance = models.IntegerField(
         _("Nominal Impedance (Ohms)"),
         blank=True,

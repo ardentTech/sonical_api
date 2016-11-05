@@ -31,3 +31,13 @@ class DriverListTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             json.loads(response.content.decode("utf-8"))["count"], 1)
+
+#            "in_production",
+#            "manufacturer",
+#            "max_power",
+#            "model",
+#            "nominal_diameter",
+#            "nominal_impedance",
+#            "resonant_frequency",
+#            "rms_power",
+#            "sensitivity",
