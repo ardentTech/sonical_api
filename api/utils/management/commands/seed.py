@@ -17,18 +17,14 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         self._create_manufacturers()
-#        self._create_materials()
         self._create_drivers()
         print("ALL DONE!")
 
     def _create_drivers(self):
-        drivers = []
-        path = os.path.join(settings.BASE_DIR, "drivers", "seed", "drivers.json")
-
-        with open(path) as data:
-            drivers = json.load(data)
-
+        file_path = os.path.join(settings.BASE_DIR, "drivers", "seed", "drivers.json")
+        drivers = self._read_json_data(file_path)
         generator = (driver["fields"] for driver in drivers)
+
         for d in generator:
             DriverFactory.create(
                 model=d["model"],
@@ -45,14 +41,11 @@ class Command(BaseCommand):
         print("created {0} drivers".format(len(drivers)))
 
     def _create_manufacturers(self):
-        manufacturers = []
-        path = os.path.join(
+        file_path = os.path.join(
             settings.BASE_DIR, "manufacturing", "seed", "manufacturers.json")
-
-        with open(path) as data:
-            manufacturers = json.load(data)
-
+        manufacturers = self._read_json_data(file_path)
         generator = (manufacturer["fields"] for manufacturer in manufacturers)
+
         for m in generator:
             manufacturer = ManufacturerFactory.create(
                 name=m["name"], website=m["website"])
@@ -60,8 +53,8 @@ class Command(BaseCommand):
 
         print("created {0} manufacturers".format(len(manufacturers)))
 
-#    def _create_materials(self):
-#        for m in MATERIALS:
-#            self.materials[m[0]] = MaterialFactory.create(name=m[0])
-#
-#        print("created {0} materials".format(len(MATERIALS)))
+    def _read_json_data(self, file_path):
+        data = []
+        with open(file_path) as file_data:
+            data = json.load(file_data)
+        return data
