@@ -1,0 +1,372 @@
+[
+{
+    "model": "manufacturing.manufacturer",
+    "pk": 1,
+    "fields": {
+        "created": "2016-11-07T21:29:52.631Z",
+        "modified": "2016-11-07T21:29:52.631Z",
+        "name": "Accuton",
+        "website": "http://accuton.com/"
+    }
+},
+{
+    "model": "manufacturing.manufacturer",
+    "pk": 2,
+    "fields": {
+        "created": "2016-11-07T21:29:52.634Z",
+        "modified": "2016-11-07T21:29:52.634Z",
+        "name": "Audax",
+        "website": "http://www.audax.com/"
+    }
+},
+{
+    "model": "manufacturing.manufacturer",
+    "pk": 3,
+    "fields": {
+        "created": "2016-11-07T21:29:52.635Z",
+        "modified": "2016-11-07T21:29:52.635Z",
+        "name": "AuraSound",
+        "website": ""
+    }
+},
+{
+    "model": "manufacturing.manufacturer",
+    "pk": 4,
+    "fields": {
+        "created": "2016-11-07T21:29:52.636Z",
+        "modified": "2016-11-07T21:29:52.636Z",
+        "name": "Aurum Cantus",
+        "website": "http://www.aurumcantus.com/"
+    }
+},
+{
+    "model": "manufacturing.manufacturer",
+    "pk": 5,
+    "fields": {
+        "created": "2016-11-07T21:29:52.637Z",
+        "modified": "2016-11-07T21:29:52.637Z",
+        "name": "Celestion",
+        "website": "http://celestion.com/"
+    }
+},
+{
+    "model": "manufacturing.manufacturer",
+    "pk": 6,
+    "fields": {
+        "created": "2016-11-07T21:29:52.637Z",
+        "modified": "2016-11-07T21:29:52.637Z",
+        "name": "Dayton Audio",
+        "website": "http://daytonaudio.com/"
+    }
+},
+{
+    "model": "manufacturing.manufacturer",
+    "pk": 7,
+    "fields": {
+        "created": "2016-11-07T21:29:52.638Z",
+        "modified": "2016-11-07T21:29:52.638Z",
+        "name": "Eclipse",
+        "website": "http://www.eclipse-td.com/us/"
+    }
+},
+{
+    "model": "manufacturing.manufacturer",
+    "pk": 8,
+    "fields": {
+        "created": "2016-11-07T21:29:52.639Z",
+        "modified": "2016-11-07T21:29:52.639Z",
+        "name": "Eminence",
+        "website": "http://www.eminence.com/"
+    }
+},
+{
+    "model": "manufacturing.manufacturer",
+    "pk": 9,
+    "fields": {
+        "created": "2016-11-07T21:29:52.639Z",
+        "modified": "2016-11-07T21:29:52.639Z",
+        "name": "Eton",
+        "website": "http://www.eton-gmbh.com/en/home"
+    }
+},
+{
+    "model": "manufacturing.manufacturer",
+    "pk": 10,
+    "fields": {
+        "created": "2016-11-07T21:29:52.640Z",
+        "modified": "2016-11-07T21:29:52.640Z",
+        "name": "FaitalPRO",
+        "website": "http://www.faitalpro.com/"
+    }
+},
+{
+    "model": "manufacturing.manufacturer",
+    "pk": 11,
+    "fields": {
+        "created": "2016-11-07T21:29:52.640Z",
+        "modified": "2016-11-07T21:29:52.640Z",
+        "name": "Fountek",
+        "website": "http://www.fountek.net/"
+    }
+},
+{
+    "model": "manufacturing.manufacturer",
+    "pk": 12,
+    "fields": {
+        "created": "2016-11-07T21:29:52.641Z",
+        "modified": "2016-11-07T21:29:52.641Z",
+        "name": "Fostex",
+        "website": "http://www.fostextinternational.com/"
+    }
+},
+{
+    "model": "manufacturing.manufacturer",
+    "pk": 13,
+    "fields": {
+        "created": "2016-11-07T21:29:52.641Z",
+        "modified": "2016-11-07T21:29:52.641Z",
+        "name": "Galaxy Audio",
+        "website": "http://www.galaxyaudio.com/"
+    }
+},
+{
+    "model": "manufacturing.manufacturer",
+    "pk": 14,
+    "fields": {
+        "created": "2016-11-07T21:29:52.642Z",
+        "modified": "2016-11-07T21:29:52.642Z",
+        "name": "Goldwood",
+        "website": "http://www.goldwoodsound.com/"
+    }
+},
+{
+    "model": "manufacturing.manufacturer",
+    "pk": 15,
+    "fields": {
+        "created": "2016-11-07T21:29:52.642Z",
+        "modified": "2016-11-07T21:29:52.642Z",
+        "name": "GRS",
+        "website": ""
+    }
+},
+{
+    "model": "manufacturing.manufacturer",
+    "pk": 16,
+    "fields": {
+        "created": "2016-11-07T21:29:52.643Z",
+        "modified": "2016-11-07T21:29:52.643Z",
+        "name": "HiVi",
+        "website": "http://www.hivi.us/"
+    }
+},
+{
+    "model": "manufacturing.manufacturer",
+    "pk": 17,
+    "fields": {
+        "created": "2016-11-07T21:29:52.643Z",
+        "modified": "2016-11-07T21:29:52.643Z",
+        "name": "HiWave",
+        "website": ""
+    }
+},
+{
+    "model": "manufacturing.manufacturer",
+    "pk": 18,
+    "fields": {
+        "created": "2016-11-07T21:29:52.644Z",
+        "modified": "2016-11-07T21:29:52.644Z",
+        "name": "Markaudio",
+        "website": "http://www.markaudio.com/"
+    }
+},
+{
+    "model": "manufacturing.manufacturer",
+    "pk": 19,
+    "fields": {
+        "created": "2016-11-07T21:29:52.644Z",
+        "modified": "2016-11-07T21:29:52.644Z",
+        "name": "Morel",
+        "website": "http://www.morelhifi.com/"
+    }
+},
+{
+    "model": "manufacturing.manufacturer",
+    "pk": 20,
+    "fields": {
+        "created": "2016-11-07T21:29:52.645Z",
+        "modified": "2016-11-07T21:29:52.645Z",
+        "name": "Mundorf",
+        "website": "http://www.mundorf.com/"
+    }
+},
+{
+    "model": "manufacturing.manufacturer",
+    "pk": 21,
+    "fields": {
+        "created": "2016-11-07T21:29:52.645Z",
+        "modified": "2016-11-07T21:29:52.645Z",
+        "name": "Peerless",
+        "website": "http://www.tymphany.com/peerless/"
+    }
+},
+{
+    "model": "manufacturing.manufacturer",
+    "pk": 22,
+    "fields": {
+        "created": "2016-11-07T21:29:52.646Z",
+        "modified": "2016-11-07T21:29:52.646Z",
+        "name": "Prescient Audio",
+        "website": "http://prescientaudio.com/"
+    }
+},
+{
+    "model": "manufacturing.manufacturer",
+    "pk": 23,
+    "fields": {
+        "created": "2016-11-07T21:29:52.646Z",
+        "modified": "2016-11-07T21:29:52.646Z",
+        "name": "PRV Audio",
+        "website": "http://prvaudio.com/"
+    }
+},
+{
+    "model": "manufacturing.manufacturer",
+    "pk": 24,
+    "fields": {
+        "created": "2016-11-07T21:29:52.647Z",
+        "modified": "2016-11-07T21:29:52.647Z",
+        "name": "Pyle",
+        "website": "http://www.pyleaudio.com/"
+    }
+},
+{
+    "model": "manufacturing.manufacturer",
+    "pk": 25,
+    "fields": {
+        "created": "2016-11-07T21:29:52.647Z",
+        "modified": "2016-11-07T21:29:52.647Z",
+        "name": "Pyramid",
+        "website": ""
+    }
+},
+{
+    "model": "manufacturing.manufacturer",
+    "pk": 26,
+    "fields": {
+        "created": "2016-11-07T21:29:52.648Z",
+        "modified": "2016-11-07T21:29:52.648Z",
+        "name": "Quam",
+        "website": "http://www.quamspeakers.com/"
+    }
+},
+{
+    "model": "manufacturing.manufacturer",
+    "pk": 27,
+    "fields": {
+        "created": "2016-11-07T21:29:52.648Z",
+        "modified": "2016-11-07T21:29:52.648Z",
+        "name": "Raal",
+        "website": "http://www.raalribbon.com/"
+    }
+},
+{
+    "model": "manufacturing.manufacturer",
+    "pk": 28,
+    "fields": {
+        "created": "2016-11-07T21:29:52.649Z",
+        "modified": "2016-11-07T21:29:52.649Z",
+        "name": "SB Acoustics",
+        "website": "http://www.sbacoustics.com/"
+    }
+},
+{
+    "model": "manufacturing.manufacturer",
+    "pk": 29,
+    "fields": {
+        "created": "2016-11-07T21:29:52.649Z",
+        "modified": "2016-11-07T21:29:52.649Z",
+        "name": "Scan-Speak",
+        "website": "http://www.scan-speak.dk/"
+    }
+},
+{
+    "model": "manufacturing.manufacturer",
+    "pk": 30,
+    "fields": {
+        "created": "2016-11-07T21:29:52.650Z",
+        "modified": "2016-11-07T21:29:52.650Z",
+        "name": "SEAS",
+        "website": "http://www.seas.no/"
+    }
+},
+{
+    "model": "manufacturing.manufacturer",
+    "pk": 31,
+    "fields": {
+        "created": "2016-11-07T21:29:52.650Z",
+        "modified": "2016-11-07T21:29:52.650Z",
+        "name": "Tang Band",
+        "website": "http://www.tb-speaker.com/en/"
+    }
+},
+{
+    "model": "manufacturing.manufacturer",
+    "pk": 32,
+    "fields": {
+        "created": "2016-11-07T21:29:52.651Z",
+        "modified": "2016-11-07T21:29:52.651Z",
+        "name": "Tectonic Elements",
+        "website": "http://www.tectonicelements.com/"
+    }
+},
+{
+    "model": "manufacturing.manufacturer",
+    "pk": 33,
+    "fields": {
+        "created": "2016-11-07T21:29:52.651Z",
+        "modified": "2016-11-07T21:29:52.651Z",
+        "name": "Tianle",
+        "website": "http://www.tianle.com/en/"
+    }
+},
+{
+    "model": "manufacturing.manufacturer",
+    "pk": 34,
+    "fields": {
+        "created": "2016-11-07T21:29:52.652Z",
+        "modified": "2016-11-07T21:29:52.652Z",
+        "name": "Titan",
+        "website": ""
+    }
+},
+{
+    "model": "manufacturing.manufacturer",
+    "pk": 35,
+    "fields": {
+        "created": "2016-11-07T21:29:52.652Z",
+        "modified": "2016-11-07T21:29:52.652Z",
+        "name": "Tymphany",
+        "website": "http://www.tymphany.com/"
+    }
+},
+{
+    "model": "manufacturing.manufacturer",
+    "pk": 36,
+    "fields": {
+        "created": "2016-11-07T21:29:52.653Z",
+        "modified": "2016-11-07T21:29:52.653Z",
+        "name": "Vifa",
+        "website": "http://www.vifa.dk/"
+    }
+},
+{
+    "model": "manufacturing.manufacturer",
+    "pk": 37,
+    "fields": {
+        "created": "2016-11-07T21:29:52.653Z",
+        "modified": "2016-11-07T21:29:52.653Z",
+        "name": "Visaton",
+        "website": "http://www.visaton.com/"
+    }
+}
+]
