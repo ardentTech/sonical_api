@@ -1,0 +1,87 @@
+[
+{
+    "model": "drivers.driver",
+    "pk": 1,
+    "fields": {
+        "created": "2016-11-05T18:29:15.020Z",
+        "modified": "2016-11-05T18:29:15.020Z",
+        "in_production": true,
+        "manufacturer": 21,
+        "max_power": 60,
+        "model": "TC9FD18-08",
+        "nominal_diameter": 3.5,
+        "nominal_impedance": 8,
+        "resonant_frequency": 125.0,
+        "rms_power": 30,
+        "sensitivity": 83.5
+    }
+},
+{
+    "model": "drivers.driver",
+    "pk": 2,
+    "fields": {
+        "created": "2016-11-05T18:29:15.021Z",
+        "modified": "2016-11-05T18:29:15.021Z",
+        "in_production": true,
+        "manufacturer": 6,
+        "max_power": 20,
+        "model": "PS95-8",
+        "nominal_diameter": 3.5,
+        "nominal_impedance": 8,
+        "resonant_frequency": 119.8,
+        "rms_power": 10,
+        "sensitivity": 85.56
+    }
+},
+{
+    "model": "drivers.driver",
+    "pk": 3,
+    "fields": {
+        "created": "2016-11-05T18:29:15.022Z",
+        "modified": "2016-11-05T18:29:15.022Z",
+        "in_production": true,
+        "manufacturer": 10,
+        "max_power": 40,
+        "model": "3FE25",
+        "nominal_diameter": 3.0,
+        "nominal_impedance": 4,
+        "resonant_frequency": 110.0,
+        "rms_power": 20,
+        "sensitivity": 91.0
+    }
+},
+{
+    "model": "drivers.driver",
+    "pk": 4,
+    "fields": {
+        "created": "2016-11-05T18:29:15.023Z",
+        "modified": "2016-11-05T18:29:15.023Z",
+        "in_production": true,
+        "manufacturer": 15,
+        "max_power": 85,
+        "model": "8FR-8",
+        "nominal_diameter": 8.0,
+        "nominal_impedance": 8,
+        "resonant_frequency": 39.0,
+        "rms_power": 60,
+        "sensitivity": 91.0
+    }
+},
+{
+    "model": "drivers.driver",
+    "pk": 5,
+    "fields": {
+        "created": "2016-11-05T18:29:15.024Z",
+        "modified": "2016-11-05T18:29:15.024Z",
+        "in_production": true,
+        "manufacturer": 6,
+        "max_power": 100,
+        "model": "PA130-8",
+        "nominal_diameter": 5.0,
+        "nominal_impedance": 8,
+        "resonant_frequency": 83.4,
+        "rms_power": 50,
+        "sensitivity": 88.2
+    }
+}
+]

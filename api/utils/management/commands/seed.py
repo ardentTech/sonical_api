@@ -1,7 +1,10 @@
+import json
+import os
+
+from django.conf import settings
 from django.core.management.base import BaseCommand
 
 from drivers.factories import DriverFactory
-from drivers.seed_data import DRIVERS
 from manufacturing.factories import ManufacturerFactory, MaterialFactory
 from manufacturing.seed_data import MANUFACTURERS, MATERIALS
 
@@ -20,25 +23,32 @@ class Command(BaseCommand):
         print("ALL DONE!")
 
     def _create_drivers(self):
-        for d in DRIVERS:
+        drivers = []
+        path = os.path.join(settings.BASE_DIR, "drivers", "seed", "drivers.json")
+
+        with open(path) as data:
+            drivers = json.load(data)
+
+        generator = (driver["fields"] for driver in drivers)
+        for d in generator:
             DriverFactory.create(
-                model=d[0],
-                manufacturer=self.manufacturers[d[1]],
-                nominal_diameter=d[2],
-                in_production=d[3],
-                max_power=d[4],
-                nominal_impedance=d[5],
-                resonant_frequency=d[6],
-                rms_power=d[7],
-                sensitivity=d[8],
+                model=d["model"],
+                manufacturer=self.manufacturers[d["manufacturer"]],
+                nominal_diameter=d["nominal_diameter"],
+                in_production=d["in_production"],
+                max_power=d["max_power"],
+                nominal_impedance=d["nominal_impedance"],
+                resonant_frequency=d["resonant_frequency"],
+                rms_power=d["rms_power"],
+                sensitivity=d["sensitivity"],
             )
 
-        print("created {0} drivers".format(len(DRIVERS)))
+        print("created {0} drivers".format(len(drivers)))
 
     def _create_manufacturers(self):
         for m in MANUFACTURERS:
-            self.manufacturers[m[0]] = ManufacturerFactory.create(
-                name=m[0], website=m[1])
+            manufacturer = ManufacturerFactory.create(name=m[0], website=m[1])
+            self.manufacturers[manufacturer.id] = manufacturer
 
         print("created {0} manufacturers".format(len(MANUFACTURERS)))
 

@@ -28,6 +28,10 @@ class DriverAdmin(admin.ModelAdmin):
         "model",
         "manufacturer",
         "nominal_impedance",
+        "resonant_frequency",
+        "sensitivity",
+        "rms_power",
+        "max_power",
         "created",
         "modified",
     )
