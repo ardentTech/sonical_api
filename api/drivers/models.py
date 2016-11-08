@@ -30,6 +30,7 @@ class Driver(Creatable, Modifiable):
     resonant_frequency = models.FloatField(
         _("Resonant Frequency (Hertz)"),
         blank=True,
+        help_text="Fs",
         null=True)
     rms_power = models.IntegerField(
         _("RMS power (Watts)"),
@@ -38,6 +39,7 @@ class Driver(Creatable, Modifiable):
     sensitivity = models.FloatField(
         _("Sensitivity (Decibels)"),
         blank=True,
+        help_text="2.83V/1m",
         null=True)
 #    hifi_or_pa (application?)
 #    frequency_response int -> int (Hz)

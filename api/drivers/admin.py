@@ -5,18 +5,22 @@ from .models import Driver
 
 class DriverAdmin(admin.ModelAdmin):
     fieldsets = (
-        (None, {
+        ("Specs", {
             "fields": (
-                "in_production",
                 "manufacturer",
-                "max_power",
                 "model",
                 "nominal_diameter",
-                "nominal_impedance",
-                "resonant_frequency",
                 "rms_power",
+                "max_power",
+                "nominal_impedance",
                 "sensitivity",
             )
+        }),
+        ("Thiele-Small", {
+            "fields": ("resonant_frequency",)
+        }),
+        ("Other", {
+            "fields": ("in_production",)
         }),
         ("Meta", {
             "classes": ("grp-collapse",),
