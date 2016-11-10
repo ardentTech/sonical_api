@@ -3,8 +3,8 @@
     "model": "drivers.driver",
     "pk": 1,
     "fields": {
-        "created": "2016-11-05T18:29:15.020Z",
-        "modified": "2016-11-05T18:29:15.020Z",
+        "created": "2016-11-07T21:54:24.922Z",
+        "modified": "2016-11-07T21:54:24.922Z",
         "in_production": true,
         "manufacturer": 21,
         "max_power": 60,
@@ -20,8 +20,8 @@
     "model": "drivers.driver",
     "pk": 2,
     "fields": {
-        "created": "2016-11-05T18:29:15.021Z",
-        "modified": "2016-11-05T18:29:15.021Z",
+        "created": "2016-11-07T21:54:24.924Z",
+        "modified": "2016-11-07T21:54:24.924Z",
         "in_production": true,
         "manufacturer": 6,
         "max_power": 20,
@@ -37,8 +37,8 @@
     "model": "drivers.driver",
     "pk": 3,
     "fields": {
-        "created": "2016-11-05T18:29:15.022Z",
-        "modified": "2016-11-05T18:29:15.022Z",
+        "created": "2016-11-07T21:54:24.925Z",
+        "modified": "2016-11-07T21:54:24.925Z",
         "in_production": true,
         "manufacturer": 10,
         "max_power": 40,
@@ -54,8 +54,8 @@
     "model": "drivers.driver",
     "pk": 4,
     "fields": {
-        "created": "2016-11-05T18:29:15.023Z",
-        "modified": "2016-11-05T18:29:15.023Z",
+        "created": "2016-11-07T21:54:24.926Z",
+        "modified": "2016-11-07T21:54:24.926Z",
         "in_production": true,
         "manufacturer": 15,
         "max_power": 85,
@@ -71,8 +71,8 @@
     "model": "drivers.driver",
     "pk": 5,
     "fields": {
-        "created": "2016-11-05T18:29:15.024Z",
-        "modified": "2016-11-05T18:29:15.024Z",
+        "created": "2016-11-07T21:54:24.927Z",
+        "modified": "2016-11-07T21:54:24.927Z",
         "in_production": true,
         "manufacturer": 6,
         "max_power": 100,
@@ -82,6 +82,227 @@
         "resonant_frequency": 83.4,
         "rms_power": 50,
         "sensitivity": 88.2
+    }
+},
+{
+    "model": "drivers.driver",
+    "pk": 6,
+    "fields": {
+        "created": "2016-11-08T22:52:26.076Z",
+        "modified": "2016-11-08T22:52:26.076Z",
+        "in_production": true,
+        "manufacturer": 6,
+        "max_power": 120,
+        "model": "DC200-8",
+        "nominal_diameter": 8.0,
+        "nominal_impedance": 8,
+        "resonant_frequency": 30.3,
+        "rms_power": 60,
+        "sensitivity": 87.0
+    }
+},
+{
+    "model": "drivers.driver",
+    "pk": 7,
+    "fields": {
+        "created": "2016-11-08T22:53:18.581Z",
+        "modified": "2016-11-08T22:53:18.581Z",
+        "in_production": true,
+        "manufacturer": 15,
+        "max_power": 90,
+        "model": "8PR-8",
+        "nominal_diameter": 8.0,
+        "nominal_impedance": 8,
+        "resonant_frequency": 52.0,
+        "rms_power": 65,
+        "sensitivity": 85.0
+    }
+},
+{
+    "model": "drivers.driver",
+    "pk": 8,
+    "fields": {
+        "created": "2016-11-08T22:54:00.298Z",
+        "modified": "2016-11-08T22:54:00.298Z",
+        "in_production": true,
+        "manufacturer": 14,
+        "max_power": 190,
+        "model": "GW-8028",
+        "nominal_diameter": 8.0,
+        "nominal_impedance": 8,
+        "resonant_frequency": 36.0,
+        "rms_power": 100,
+        "sensitivity": 84.0
+    }
+},
+{
+    "model": "drivers.driver",
+    "pk": 9,
+    "fields": {
+        "created": "2016-11-08T22:58:46.771Z",
+        "modified": "2016-11-08T22:58:46.771Z",
+        "in_production": true,
+        "manufacturer": 14,
+        "max_power": 200,
+        "model": "GW-208/8",
+        "nominal_diameter": 8.0,
+        "nominal_impedance": 8,
+        "resonant_frequency": 56.1,
+        "rms_power": 200,
+        "sensitivity": 88.0
+    }
+},
+{
+    "model": "drivers.driver",
+    "pk": 10,
+    "fields": {
+        "created": "2016-11-08T23:00:29.865Z",
+        "modified": "2016-11-08T23:00:29.865Z",
+        "in_production": true,
+        "manufacturer": 15,
+        "max_power": 85,
+        "model": "8FR-8",
+        "nominal_diameter": 8.0,
+        "nominal_impedance": 8,
+        "resonant_frequency": 39.0,
+        "rms_power": 85,
+        "sensitivity": 91.0
+    }
+},
+{
+    "model": "drivers.driver",
+    "pk": 11,
+    "fields": {
+        "created": "2016-11-08T23:06:41.587Z",
+        "modified": "2016-11-08T23:06:41.587Z",
+        "in_production": true,
+        "manufacturer": 14,
+        "max_power": 330,
+        "model": "GW-8PC-8",
+        "nominal_diameter": 8.0,
+        "nominal_impedance": 8,
+        "resonant_frequency": 55.01,
+        "rms_power": 330,
+        "sensitivity": 88.2
+    }
+},
+{
+    "model": "drivers.driver",
+    "pk": 12,
+    "fields": {
+        "created": "2016-11-08T23:07:34.545Z",
+        "modified": "2016-11-08T23:07:34.545Z",
+        "in_production": true,
+        "manufacturer": 14,
+        "max_power": 190,
+        "model": "GW-8024",
+        "nominal_diameter": 8.0,
+        "nominal_impedance": 4,
+        "resonant_frequency": 44.1,
+        "rms_power": 100,
+        "sensitivity": 89.6
+    }
+},
+{
+    "model": "drivers.driver",
+    "pk": 13,
+    "fields": {
+        "created": "2016-11-08T23:10:18.329Z",
+        "modified": "2016-11-08T23:10:18.329Z",
+        "in_production": true,
+        "manufacturer": 15,
+        "max_power": 200,
+        "model": "8PF-8",
+        "nominal_diameter": 8.0,
+        "nominal_impedance": 8,
+        "resonant_frequency": 51.0,
+        "rms_power": 100,
+        "sensitivity": 87.0
+    }
+},
+{
+    "model": "drivers.driver",
+    "pk": 14,
+    "fields": {
+        "created": "2016-11-10T23:06:12.654Z",
+        "modified": "2016-11-10T23:06:12.654Z",
+        "in_production": true,
+        "manufacturer": 14,
+        "max_power": 120,
+        "model": "GM-85/8",
+        "nominal_diameter": 5.0,
+        "nominal_impedance": 8,
+        "resonant_frequency": 470.0,
+        "rms_power": 60,
+        "sensitivity": 96.0
+    }
+},
+{
+    "model": "drivers.driver",
+    "pk": 15,
+    "fields": {
+        "created": "2016-11-10T23:07:07.999Z",
+        "modified": "2016-11-10T23:07:07.999Z",
+        "in_production": true,
+        "manufacturer": 6,
+        "max_power": 120,
+        "model": "RS52AN-8",
+        "nominal_diameter": 2.0,
+        "nominal_impedance": 8,
+        "resonant_frequency": 341.0,
+        "rms_power": 60,
+        "sensitivity": 89.4
+    }
+},
+{
+    "model": "drivers.driver",
+    "pk": 16,
+    "fields": {
+        "created": "2016-11-10T23:08:03.877Z",
+        "modified": "2016-11-10T23:08:03.877Z",
+        "in_production": true,
+        "manufacturer": 24,
+        "max_power": 200,
+        "model": "PDMR5",
+        "nominal_diameter": 5.0,
+        "nominal_impedance": 8,
+        "resonant_frequency": null,
+        "rms_power": 100,
+        "sensitivity": 92.0
+    }
+},
+{
+    "model": "drivers.driver",
+    "pk": 17,
+    "fields": {
+        "created": "2016-11-10T23:08:36.839Z",
+        "modified": "2016-11-10T23:08:36.839Z",
+        "in_production": true,
+        "manufacturer": 16,
+        "max_power": 30,
+        "model": "B3N",
+        "nominal_diameter": 3.0,
+        "nominal_impedance": 8,
+        "resonant_frequency": 77.0,
+        "rms_power": 10,
+        "sensitivity": 81.0
+    }
+},
+{
+    "model": "drivers.driver",
+    "pk": 18,
+    "fields": {
+        "created": "2016-11-10T23:09:18.870Z",
+        "modified": "2016-11-10T23:09:18.870Z",
+        "in_production": true,
+        "manufacturer": 6,
+        "max_power": 60,
+        "model": "RS100-4",
+        "nominal_diameter": 4.0,
+        "nominal_impedance": 4,
+        "resonant_frequency": 84.8,
+        "rms_power": 30,
+        "sensitivity": 87.5
     }
 }
 ]
