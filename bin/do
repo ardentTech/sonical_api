@@ -62,7 +62,7 @@ runserver() {
   echo
   echo "########### RUN SERVER ###########"
 
-  cd ${PROJ} && ${PM} runserver ${SETTINGS}
+  cd ${PROJ} && ${PM} runserver 127.0.0.1:8001 ${SETTINGS}
 }
 
 test() {
