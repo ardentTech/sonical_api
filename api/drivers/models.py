@@ -4,7 +4,8 @@ from django.utils.translation import ugettext_lazy as _
 from utils.models import Creatable, Modifiable
 
 
-# @todo need concept of version?
+# @todo need concept of version? manufacturer *could* keep the same model
+# name...
 class Driver(Creatable, Modifiable):
 
     in_production = models.BooleanField(
@@ -19,27 +20,33 @@ class Driver(Creatable, Modifiable):
     model = models.CharField(
         _("Model"),
         max_length=128)
-    nominal_diameter = models.FloatField(
+    nominal_diameter = models.DecimalField(
         _("Nominal Diameter (Inches)"),
         blank=True,
+        decimal_places=2,
+        max_digits=5,
         null=True)
     nominal_impedance = models.IntegerField(
         _("Nominal Impedance (Ohms)"),
         blank=True,
         null=True)
-    resonant_frequency = models.FloatField(
+    resonant_frequency = models.DecimalField(
         _("Resonant Frequency (Hertz)"),
         blank=True,
+        decimal_places=2,
         help_text="Fs",
+        max_digits=7,
         null=True)
     rms_power = models.IntegerField(
         _("RMS power (Watts)"),
         blank=True,
         null=True)
-    sensitivity = models.FloatField(
+    sensitivity = models.DecimalField(
         _("Sensitivity (Decibels)"),
         blank=True,
+        decimal_places=2,
         help_text="2.83V/1m",
+        max_digits=5,
         null=True)
 #    hifi_or_pa (application?)
 #    frequency_response int -> int (Hz)
