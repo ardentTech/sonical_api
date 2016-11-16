@@ -8,6 +8,7 @@ class Manufacturer(Creatable, Modifiable):
 
     name = models.CharField(
         _("Name"),
+        db_index=True,
         max_length=128,
         unique=True)
     website = models.URLField(
@@ -25,6 +26,7 @@ class Material(Creatable, Modifiable):
 
     name = models.CharField(
         _("Name"),
+        db_index=True,
         max_length=128,
         unique=True)
 

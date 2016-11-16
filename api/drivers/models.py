@@ -19,6 +19,7 @@ class Driver(Creatable, Modifiable):
         null=True)
     model = models.CharField(
         _("Model"),
+        db_index=True,
         max_length=128)
     nominal_diameter = models.DecimalField(
         _("Nominal Diameter (Inches)"),
