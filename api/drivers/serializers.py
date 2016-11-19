@@ -11,6 +11,7 @@ class DriverSerializer(serializers.ModelSerializer):
     class Meta:
         fields = (
             "created",
+            "dc_resistance",
             "id",
             "in_production",
             "manufacturer",

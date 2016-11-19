@@ -35,6 +35,17 @@ class DriverListSearchTestCase(APITestCase):
 
 class DriverListFilterTestCase(APITestCase):
 
+    def test_get_list_filter_dc_resistance_ok(self):
+        DriverFactory.create(dc_resistance=2.00)
+        DriverFactory.create(dc_resistance=8.00)
+
+        # @todo find a way to use lowercase 'true' in query param
+        response = self.client.get(
+            reverse("api:driver-list") + "?dc_resistance=2.00")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            json.loads(response.content.decode("utf-8"))["count"], 1)
+
     def test_get_list_filter_in_production_ok(self):
         DriverFactory.create(in_production=True)
         DriverFactory.create(in_production=False)

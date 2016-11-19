@@ -8,6 +8,12 @@ from utils.models import Creatable, Modifiable
 # name...
 class Driver(Creatable, Modifiable):
 
+    dc_resistance = models.DecimalField(
+        _("DC Resistance (ohms)"),
+        blank=True,
+        decimal_places=2,
+        max_digits=5,
+        null=True)
     in_production = models.BooleanField(
         _("In Production"),
         default=True)
@@ -49,9 +55,10 @@ class Driver(Creatable, Modifiable):
         help_text="2.83V/1m",
         max_digits=5,
         null=True)
+#    voice_coil_diameter (decimal in)
+#    data_source (url)
 #    hifi_or_pa (application?)
 #    frequency_response int -> int (Hz)
-#    dc_resistance float (ohms)
 #    voice_coil_inductance float (mH)
 #    mechanical_q float
 #    electromagnetic_q float

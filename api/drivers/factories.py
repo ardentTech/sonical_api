@@ -6,6 +6,7 @@ from manufacturing.factories import ManufacturerFactory
 
 class DriverFactory(factory.DjangoModelFactory):
 
+    dc_resistance = FuzzyDecimal(1.00, 16.00)
     manufacturer = factory.SubFactory(ManufacturerFactory)
     model = factory.Sequence(lambda n: "model-{0}".format(n))
     nominal_diameter = FuzzyDecimal(50.00, 400.00)

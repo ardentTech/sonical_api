@@ -7,6 +7,7 @@ class DriverAdmin(admin.ModelAdmin):
     fieldsets = (
         ("Specs", {
             "fields": (
+                "dc_resistance",
                 "manufacturer",
                 "model",
                 "nominal_diameter",
