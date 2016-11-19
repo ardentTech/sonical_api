@@ -39,9 +39,18 @@ class DriverListFilterTestCase(APITestCase):
         DriverFactory.create(dc_resistance=2.00)
         DriverFactory.create(dc_resistance=8.00)
 
-        # @todo find a way to use lowercase 'true' in query param
         response = self.client.get(
             reverse("api:driver-list") + "?dc_resistance=2.00")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            json.loads(response.content.decode("utf-8"))["count"], 1)
+
+    def test_get_list_filter_electromagnetic_q_ok(self):
+        DriverFactory.create(electromagnetic_q=2.00)
+        DriverFactory.create(electromagnetic_q=8.00)
+
+        response = self.client.get(
+            reverse("api:driver-list") + "?electromagnetic_q=2.00")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             json.loads(response.content.decode("utf-8"))["count"], 1)
@@ -75,6 +84,16 @@ class DriverListFilterTestCase(APITestCase):
 
         response = self.client.get(
             reverse("api:driver-list") + "?max_power=60")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            json.loads(response.content.decode("utf-8"))["count"], 1)
+
+    def test_get_list_filter_mechanical_q_ok(self):
+        DriverFactory.create(mechanical_q=2.00)
+        DriverFactory.create(mechanical_q=8.00)
+
+        response = self.client.get(
+            reverse("api:driver-list") + "?mechanical_q=2.00")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             json.loads(response.content.decode("utf-8"))["count"], 1)
@@ -136,6 +155,16 @@ class DriverListFilterTestCase(APITestCase):
 
         response = self.client.get(
             reverse("api:driver-list") + "?sensitivity=90.1")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            json.loads(response.content.decode("utf-8"))["count"], 1)
+
+    def test_get_list_filter_voice_coil_inductance_ok(self):
+        DriverFactory.create(voice_coil_inductance=0.60)
+        DriverFactory.create(voice_coil_inductance=0.90)
+
+        response = self.client.get(
+            reverse("api:driver-list") + "?voice_coil_inductance=0.60")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             json.loads(response.content.decode("utf-8"))["count"], 1)

@@ -8,13 +8,16 @@ class DriverAdmin(admin.ModelAdmin):
         ("Specs", {
             "fields": (
                 "dc_resistance",
+                "electromagnetic_q",
                 "manufacturer",
+                "mechanical_q",
                 "model",
                 "nominal_diameter",
                 "rms_power",
                 "max_power",
                 "nominal_impedance",
                 "sensitivity",
+                "voice_coil_inductance",
             )
         }),
         ("Thiele-Small", {

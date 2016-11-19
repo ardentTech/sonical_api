@@ -14,6 +14,12 @@ class Driver(Creatable, Modifiable):
         decimal_places=2,
         max_digits=5,
         null=True)
+    electromagnetic_q = models.DecimalField(
+        _("Electromagnetic Q"),
+        blank=True,
+        decimal_places=2,
+        max_digits=5,
+        null=True)
     in_production = models.BooleanField(
         _("In Production"),
         default=True)
@@ -22,6 +28,12 @@ class Driver(Creatable, Modifiable):
     max_power = models.IntegerField(
         _("Max Power (Watts)"),
         blank=True,
+        null=True)
+    mechanical_q = models.DecimalField(
+        _("Mechanical Q"),
+        blank=True,
+        decimal_places=2,
+        max_digits=5,
         null=True)
     model = models.CharField(
         _("Model"),
@@ -55,13 +67,16 @@ class Driver(Creatable, Modifiable):
         help_text="2.83V/1m",
         max_digits=5,
         null=True)
-#    voice_coil_diameter (decimal in)
+    voice_coil_inductance = models.DecimalField(
+        _("Voice Coil Inductance (MilliHenries)"),
+        blank=True,
+        decimal_places=2,
+        max_digits=5,
+        null=True)
+
 #    data_source (url)
 #    hifi_or_pa (application?)
 #    frequency_response int -> int (Hz)
-#    voice_coil_inductance float (mH)
-#    mechanical_q float
-#    electromagnetic_q float
 #    total_q float
 #    compliance_equivalent_volume float (ft**3)
 #    mechanical_compliance_of_suspension float (mm/N)

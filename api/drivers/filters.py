@@ -11,14 +11,17 @@ class DriverFilter(django_filters.FilterSet):
     class Meta:
         fields = [
             "dc_resistance",
+            "electromagnetic_q",
             "in_production",
             "manufacturer",
             "max_power",
+            "mechanical_q",
             "model",
             "nominal_diameter",
             "nominal_impedance",
             "resonant_frequency",
             "rms_power",
             "sensitivity",
+            "voice_coil_inductance",
         ]
         model = Driver
