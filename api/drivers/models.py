@@ -4,10 +4,11 @@ from django.utils.translation import ugettext_lazy as _
 from utils.models import Creatable, Modifiable
 
 
-# @todo need concept of version? manufacturer *could* keep the same model
-# name...
 class Driver(Creatable, Modifiable):
 
+    data_source = models.URLField(
+        _("Data Source"),
+        db_index=True)
     dc_resistance = models.DecimalField(
         _("DC Resistance (ohms)"),
         blank=True,
@@ -74,7 +75,8 @@ class Driver(Creatable, Modifiable):
         max_digits=5,
         null=True)
 
-#    data_source (url)
+# @todo need concept of version? manufacturer *could* keep the same model
+# name...
 #    hifi_or_pa (application?)
 #    frequency_response int -> int (Hz)
 #    total_q float
@@ -104,6 +106,6 @@ class Driver(Creatable, Modifiable):
     def __str__(self):
         return "{0} {1}".format(self.manufacturer.name, self.model)
 
-    def validate_unique(self, exclude=None):
+#    def validate_unique(self, exclude=None):
         # @todo validate model + manufacturer.name? part number?
-        pass
+#        pass
