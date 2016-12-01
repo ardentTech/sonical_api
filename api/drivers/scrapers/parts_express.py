@@ -1,3 +1,4 @@
+from decimal import Decimal
 import re
 
 from lxml import html
@@ -8,6 +9,12 @@ from drivers.models import Driver
 from manufacturing.models import Manufacturer
 
 
+# @todo create a report each time this is run?
+
+
+# this is happy path and based upon all fields being present and an expected
+# order in the DOM. problematic. would work better if matching against the row
+# title, and then grabbing the following <span> tag's value...
 DC_RESISTANCE = '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[2]/ul/li[2]/span[2]/text()'
 DRIVER_CATEGORIES_PATH = '/cat/hi-fi-woofers-subwoofers-midranges-tweeters/13'
 DRIVER_CATEGORY_XPATH = '//a[@id="lbCategoryName"]/@href'
@@ -38,6 +45,7 @@ class PartsExpress(object):
 
     def __init__(self):
         self.data_store = {}
+        self.manufacturers = {m.name: m for m in Manufacturer.objects.all()}
 
     # @todo handle each category on a different thread
     def run(self):
@@ -50,11 +58,17 @@ class PartsExpress(object):
     def _build_url(self, path):
         return PROTOCOL + HOST + path
 
-    # @todo fetch all manufacturers on init
     def _create_driver(self, attrs):
-        manufacturer, created = Manufacturer.objects.get_or_create(
-            name=attrs["manufacturer"])
-        DriverFactory.create(manufacturer=manufacturer, model=attrs["model"])
+        name = attrs["manufacturer"]
+        try:
+            attrs["manufacturer"] = self.manufacturers[name]
+        except:
+            self.manufacturers[name] = Manufacturer.objects.create(name=name)
+            attrs["manufacturer"] = self.manufacturers[name]
+
+        print("Creating {0}".format(attrs))
+        DriverFactory.create(**attrs)
+#        print("Created {0} {1}".format(attrs["manufacturer"], attrs["model"]))
 
     def _create_drivers(self, store):
         for path in store:
@@ -79,25 +93,35 @@ class PartsExpress(object):
         # @todo this is so error prone bc PE doesn't use IDs...
         # need to use basic regex searches for units, etc. to at least try
         # to get sanitary data
-        attrs["dc_resistance"] = tree.xpath(DC_RESISTANCE)[0]
+        # @todo need to remove units, white space, etc.
+        # (model field name, xpath pattern, regex patter) ?
+        attrs["dc_resistance"] = self._sanitize_resistance(
+            tree.xpath(DC_RESISTANCE)[0])
         attrs["electromagnetic_q"] = tree.xpath(ELECTROMAGNETIC_Q)[0]
         attrs["manufacturer"] = tree.xpath(MANUFACTURER)[0]
-        attrs["max_power"] = tree.xpath(MAX_POWER)[0]
+        attrs["max_power"] = self._sanitize_power(tree.xpath(MAX_POWER)[0])
         attrs["mechanical_q"] = tree.xpath(MECHANICAL_Q)[0]
         attrs["model"] = tree.xpath(MODEL)[0]
-        attrs["nominal_diameter"] = tree.xpath(NOMINAL_DIAMETER)[0]
-        attrs["nominal_impedance"] = tree.xpath(NOMINAL_IMPEDANCE)[0]
-        attrs["resonant_frequency"] = tree.xpath(RESONANT_FREQUENCY)[0]
-        attrs["rms_power"] = tree.xpath(RMS_POWER)[0]
-        attrs["sensitivity"] = tree.xpath(SENSITIVITY)[0]
-        attrs["voice_coil_inductance"] = tree.xpath(VOICE_COIL_INDUCTANCE)[0]
+        attrs["nominal_diameter"] = self._sanitize_nominal_diameter(
+            tree.xpath(NOMINAL_DIAMETER)[0])
+        attrs["nominal_impedance"] = self._sanitize_resistance(
+            tree.xpath(NOMINAL_IMPEDANCE)[0])
+        attrs["resonant_frequency"] = self._sanitize_resonant_frequency(
+            tree.xpath(RESONANT_FREQUENCY)[0])
+        attrs["rms_power"] = self._sanitize_power(tree.xpath(RMS_POWER)[0])
+        attrs["sensitivity"] = self._sanitize_sensitivity(
+            tree.xpath(SENSITIVITY)[0])
+        attrs["voice_coil_inductance"] = self._sanitize_inductance(
+            tree.xpath(VOICE_COIL_INDUCTANCE)[0])
 
         return attrs
 
     def _get_drivers(self, path, store):
         page = requests.get(self._build_url(path))
         tree = html.fromstring(page.content)
-        store.append(tree.xpath(DRIVER_DETAIL_XPATH)[0])
+
+        for driver in tree.xpath(DRIVER_DETAIL_XPATH):
+            store.append(driver)
 
         try:  # go to next drivers page if exists
             next_path = tree.xpath(NEXT_PAGE_XPATH)[0]
@@ -106,3 +130,29 @@ class PartsExpress(object):
             return
         except Exception as e:
             print("Unexpected Exception: {0}".format(e))
+
+    def _sanitize_sensitivity(self, val):
+        return Decimal(val.split(" ")[0])
+
+    def _sanitize_resistance(self, val):
+        return Decimal(val.split(" ")[0])
+
+    def _sanitize_inductance(self, val):
+        return Decimal(val.split(" ")[0])
+
+    def _sanitize_nominal_diameter(self, val):
+        parts = val.rstrip('"').split("-")
+        integer_part = Decimal(parts[0])
+        fraction_part = Decimal(0)
+
+        if len(parts) > 1:
+            fractional_parts = parts[1].split("/")
+            fraction_part = Decimal(fractional_parts[0]) / Decimal(fractional_parts[1])
+
+        return integer_part + fraction_part
+
+    def _sanitize_power(self, val):
+        return int(val.split(" ")[0])
+
+    def _sanitize_resonant_frequency(self, val):
+        return Decimal(val.split(" ")[0])
