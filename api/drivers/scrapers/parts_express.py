@@ -37,10 +37,6 @@ VOICE_COIL_INDUCTANCE = '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDe
 # @todo add ability to only scrape one category at a time?
 
 
-class DriverScraper(object):
-    pass
-
-
 class PartsExpress(object):
 
     def __init__(self):

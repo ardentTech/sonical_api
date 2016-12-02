@@ -56,6 +56,13 @@ runserver() {
   cd ${PROJ} && ${PM} runserver 127.0.0.1:8001 ${SETTINGS}
 }
 
+syncdrivers() {
+  echo
+  echo "########### SYNC DRIVERS ###########"
+
+  cd ${PROJ} && ${PM} syncdrivers ${SETTINGS}
+}
+
 test() {
   echo
   echo "########### TEST ###########"
