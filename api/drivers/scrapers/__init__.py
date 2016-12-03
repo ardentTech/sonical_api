@@ -1,1 +1,1 @@
-from .parts_express import PartsExpress
+from .parts_express import PartsExpressScraper

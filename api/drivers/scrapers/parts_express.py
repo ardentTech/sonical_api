@@ -1,154 +1,133 @@
 from decimal import Decimal
 import re
+from time import sleep
 
 from lxml import html
 import requests
 
-from drivers.factories import DriverFactory
-from drivers.models import Driver
-from manufacturing.models import Manufacturer
+
+# @todo need some sort of dev mode
+# @todo only run one category at a time? track via class variable?
+# @todo add sleeps
+# @todo multithreading
+# @todo be more explicit naming XPATH patterns
+# @todo move XPATH patterns to separate module
+# @todo adjust XPATH patterns to match by text instead of just position indexes
 
 
-# @todo create a report each time this is run?
+class Scraper(object):
+
+    SCRAPER_ID = "Sonical Scraper 1.0 (jonathan@ardent.tech)"
+    URL = "https://www.parts-express.com"
+
+    def run(self, path):
+        raise Exception("Sub-classes of Scraper must implement `run(self, path)`")
+
+    def _get_tree(self, path):
+        headers = {"user-agent": self.SCRAPER_ID}
+        page = requests.get(self.URL + path, headers=headers)
+        tree = html.fromstring(page.content)
+        sleep(1)
+        return tree
 
 
-# this is happy path and based upon all fields being present and an expected
-# order in the DOM. problematic. would work better if matching against the row
-# title, and then grabbing the following <span> tag's value...
-DC_RESISTANCE = '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[2]/ul/li[2]/span[2]/text()'
-DRIVER_CATEGORIES_PATH = '/cat/hi-fi-woofers-subwoofers-midranges-tweeters/13'
-DRIVER_CATEGORY_XPATH = '//a[@id="lbCategoryName"]/@href'
-DRIVER_DETAIL_XPATH = '//a[@id="GridViewProdLink"]/@href'
-ELECTROMAGNETIC_Q = '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[2]/ul/li[7]/span[2]/text()'
-HOST = "www.parts-express.com"
-MANUFACTURER = '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[6]/ul/li[1]/span[2]/text()'
-MAX_POWER = '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[1]/ul/li[4]/span[2]/text()'
-MECHANICAL_Q = '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[2]/ul/li[5]/span[2]/text()'
-MODEL = '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[6]/ul/li[2]/span[2]/text()'
-NEXT_PAGE_XPATH = '//a[@id="ctl00_ctl00_MainContent_uxEBCategory_uxEBProductList_uxBottomPagingLinks_aNextNav"]/@href'
-NOMINAL_DIAMETER = '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[1]/ul/li[1]/span[2]/text()'
-NOMINAL_IMPEDANCE = '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[1]/ul/li[5]/span[2]/text()'
-PROTOCOL = "https://"
-RESONANT_FREQUENCY = '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[2]/ul/li[1]/span[2]/text()'
-RMS_POWER = '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[1]/ul/li[2]/span[2]/text()'
-SENSITIVITY = '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[1]/ul/li[8]/span[2]/text()'
-VOICE_COIL_INDUCTANCE = '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[2]/ul/li[4]/span[2]/text()'
+class DriverScraper(Scraper):
 
-# @todo add ability to only scrape one category at a time?
-
-
-class PartsExpress(object):
+    DC_RESISTANCE = '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[2]/ul/li[2]/span[2]/text()'
+    ELECTROMAGNETIC_Q = '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[2]/ul/li[7]/span[2]/text()'
+    MANUFACTURER = '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[6]/ul/li[1]/span[2]/text()'
+    MAX_POWER = '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[1]/ul/li[4]/span[2]/text()'
+    MECHANICAL_Q = '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[2]/ul/li[5]/span[2]/text()'
+    MODEL = '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[6]/ul/li[2]/span[2]/text()'
+    NOMINAL_DIAMETER = '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[1]/ul/li[1]/span[2]/text()'
+    NOMINAL_IMPEDANCE = '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[1]/ul/li[5]/span[2]/text()'
+    RESONANT_FREQUENCY = '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[2]/ul/li[1]/span[2]/text()'
+    RMS_POWER = '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[1]/ul/li[2]/span[2]/text()'
+    SENSITIVITY = '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[1]/ul/li[8]/span[2]/text()'
+    VOICE_COIL_INDUCTANCE = '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[2]/ul/li[4]/span[2]/text()'
 
     def __init__(self):
-        self.data_store = {}
-        self.manufacturers = {m.name: m for m in Manufacturer.objects.all()}
+        self.attributes = [
+            # (key, xpath_pattern, santizer)
+            ("dc_resistance", self.DC_RESISTANCE, self._sanitize_decimal),
+            ("electromagnetic_q", self.ELECTROMAGNETIC_Q, None),
+            ("manufacturer", self.MANUFACTURER, None),
+            ("max_power", self.MAX_POWER, self._sanitize_int),
+            ("mechanical_q", self.MECHANICAL_Q, None),
+            ("model", self.MODEL, None),
+            ("nominal_diameter", self.NOMINAL_DIAMETER, None),
+            ("nominal_impedance", self.NOMINAL_IMPEDANCE, self._sanitize_decimal),
+            ("resonant_frequency", self.RESONANT_FREQUENCY, self._sanitize_decimal),
+            ("rms_power", self.RMS_POWER, self._sanitize_int),
+            ("sensitivity", self.SENSITIVITY, self._sanitize_decimal),
+            ("voice_coil_inductance", self.VOICE_COIL_INDUCTANCE, self._sanitize_decimal)]
 
-    # @todo handle each category on a different thread
-    def run(self):
-        categories = self._get_categories()
-        for category in categories:
-            data_store = self.data_store.setdefault(category[0], [])
-            self._get_drivers(category[1], data_store)
-            self._create_drivers(data_store)
+    def run(self, path):
+        tree = self._get_tree(path)
+        attr = {}
+        for _attr in self.attributes:
+            val = tree.xpath(_attr[1])[0]
+            if _attr[2] is not None:
+                val = _attr[2](val)
+            attr[_attr[0]] = val
 
-    def _build_url(self, path):
-        return PROTOCOL + HOST + path
+        return attr
 
-    def _create_driver(self, attrs):
-        name = attrs["manufacturer"]
-        try:
-            attrs["manufacturer"] = self.manufacturers[name]
-        except:
-            self.manufacturers[name] = Manufacturer.objects.create(name=name)
-            attrs["manufacturer"] = self.manufacturers[name]
-
-        print("Creating {0}".format(attrs))
-        DriverFactory.create(**attrs)
-#        print("Created {0} {1}".format(attrs["manufacturer"], attrs["model"]))
-
-    def _create_drivers(self, store):
-        for path in store:
-            url = self._build_url(path)
-            driver = Driver.objects.filter(data_source=url)
-            if not driver:
-                self._create_driver(self._get_driver_attrs(url))
-
-    def _get_categories(self):
-        page = requests.get(self._build_url(DRIVER_CATEGORIES_PATH))
-        tree = html.fromstring(page.content)
-        paths = tree.xpath(DRIVER_CATEGORY_XPATH)
-        return [
-            (p.split("/")[2], p) for p in paths if not re.search(r'replace|recone', p)]
-
-    def _get_driver_attrs(self, url):
-        attrs = {}
-
-        page = requests.get(url)
-        tree = html.fromstring(page.content)
-
-        # @todo this is so error prone bc PE doesn't use IDs...
-        # need to use basic regex searches for units, etc. to at least try
-        # to get sanitary data
-        # @todo need to remove units, white space, etc.
-        # (model field name, xpath pattern, regex patter) ?
-        attrs["dc_resistance"] = self._sanitize_resistance(
-            tree.xpath(DC_RESISTANCE)[0])
-        attrs["electromagnetic_q"] = tree.xpath(ELECTROMAGNETIC_Q)[0]
-        attrs["manufacturer"] = tree.xpath(MANUFACTURER)[0]
-        attrs["max_power"] = self._sanitize_power(tree.xpath(MAX_POWER)[0])
-        attrs["mechanical_q"] = tree.xpath(MECHANICAL_Q)[0]
-        attrs["model"] = tree.xpath(MODEL)[0]
-        attrs["nominal_diameter"] = self._sanitize_nominal_diameter(
-            tree.xpath(NOMINAL_DIAMETER)[0])
-        attrs["nominal_impedance"] = self._sanitize_resistance(
-            tree.xpath(NOMINAL_IMPEDANCE)[0])
-        attrs["resonant_frequency"] = self._sanitize_resonant_frequency(
-            tree.xpath(RESONANT_FREQUENCY)[0])
-        attrs["rms_power"] = self._sanitize_power(tree.xpath(RMS_POWER)[0])
-        attrs["sensitivity"] = self._sanitize_sensitivity(
-            tree.xpath(SENSITIVITY)[0])
-        attrs["voice_coil_inductance"] = self._sanitize_inductance(
-            tree.xpath(VOICE_COIL_INDUCTANCE)[0])
-
-        return attrs
-
-    def _get_drivers(self, path, store):
-        page = requests.get(self._build_url(path))
-        tree = html.fromstring(page.content)
-
-        for driver in tree.xpath(DRIVER_DETAIL_XPATH):
-            store.append(driver)
-
-        try:  # go to next drivers page if exists
-            next_path = tree.xpath(NEXT_PAGE_XPATH)[0]
-            self._get_drivers(next_path, store)
-        except IndexError:  # no next_path was found
-            return
-        except Exception as e:
-            print("Unexpected Exception: {0}".format(e))
-
-    def _sanitize_sensitivity(self, val):
+    def _sanitize_decimal(self, val):
         return Decimal(val.split(" ")[0])
 
-    def _sanitize_resistance(self, val):
-        return Decimal(val.split(" ")[0])
-
-    def _sanitize_inductance(self, val):
-        return Decimal(val.split(" ")[0])
-
-    def _sanitize_nominal_diameter(self, val):
-        parts = val.rstrip('"').split("-")
-        integer_part = Decimal(parts[0])
-        fraction_part = Decimal(0)
-
-        if len(parts) > 1:
-            fractional_parts = parts[1].split("/")
-            fraction_part = Decimal(fractional_parts[0]) / Decimal(fractional_parts[1])
-
-        return integer_part + fraction_part
-
-    def _sanitize_power(self, val):
+    def _sanitize_int(self, val):
         return int(val.split(" ")[0])
 
-    def _sanitize_resonant_frequency(self, val):
-        return Decimal(val.split(" ")[0])
+
+class DriverListScraper(Scraper):
+
+    DRIVER_DETAIL_XPATH = '//a[@id="GridViewProdLink"]/@href'
+    NEXT_PAGE_XPATH = '//a[@id="ctl00_ctl00_MainContent_uxEBCategory_uxEBProductList_uxBottomPagingLinks_aNextNav"]/@href'
+
+    def __init__(self):
+        self.data = []
+
+    def run(self, path):
+        tree = self._get_tree(path)
+
+        for driver in tree.xpath(self.DRIVER_DETAIL_XPATH):
+            self.data.append(driver)
+
+        return self.data
+        # crawl pagination
+        try:
+            return self.run(tree.xpath(self.NEXT_PAGE_XPATH)[0])
+        except IndexError:
+            return self.data
+
+
+class CategoryListScraper(Scraper):
+
+    DRIVER_CATEGORY_XPATH = '//a[@id="lbCategoryName"]/@href'
+
+    def run(self, path):
+        tree = self._get_tree(path)
+        categories = tree.xpath(self.DRIVER_CATEGORY_XPATH)
+        return [c for c in categories if not re.search(r'replace|recone', c)]
+
+
+class PartsExpressScraper(Scraper):
+
+    CATEGORY_LIST_PATH = "/cat/hi-fi-woofers-subwoofers-midranges-tweeters/13"
+
+    def __init__(self):
+        self.scrapers = {
+            "category_list": CategoryListScraper(),
+            "driver_list": DriverListScraper(),
+            "driver": DriverScraper()}
+
+    def run(self):
+        drivers = []
+        category_paths = self.scrapers["category_list"].run(self.CATEGORY_LIST_PATH)
+        for cp in category_paths:
+            driver_paths = self.scrapers["driver_list"].run(cp)
+            for dp in driver_paths:
+                drivers.append(self.scrapers["driver"].run(dp))
+
+        return drivers

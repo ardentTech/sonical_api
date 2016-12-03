@@ -60,7 +60,7 @@ syncdrivers() {
   echo
   echo "########### SYNC DRIVERS ###########"
 
-  cd ${PROJ} && ${PM} syncdrivers ${SETTINGS}
+  cd ${PROJ} && ${PM} sync_drivers ${SETTINGS}
 }
 
 test() {
