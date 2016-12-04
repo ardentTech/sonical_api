@@ -6,12 +6,10 @@ from lxml import html
 import requests
 
 
+# @todo scrape driver price, rating and review #
 # @todo need some sort of dev mode
-# @todo only run one category at a time? track via class variable?
-# @todo add sleeps
 # @todo multithreading
-# @todo be more explicit naming XPATH patterns
-# @todo move XPATH patterns to separate module
+# @todo move XPATH patterns to separate module?
 # @todo adjust XPATH patterns to match by text instead of just position indexes
 
 
@@ -42,9 +40,12 @@ class DriverScraper(Scraper):
     NOMINAL_DIAMETER = '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[1]/ul/li[1]/span[2]/text()'
     NOMINAL_IMPEDANCE = '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[1]/ul/li[5]/span[2]/text()'
     RESONANT_FREQUENCY = '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[2]/ul/li[1]/span[2]/text()'
+    REVIEW_COUNT = '//*[@id="TurnToTopSummary"]/div[1]/div/div[2]/a[1]/text()'
     RMS_POWER = '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[1]/ul/li[2]/span[2]/text()'
     SENSITIVITY = '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[1]/ul/li[8]/span[2]/text()'
     VOICE_COIL_INDUCTANCE = '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[2]/ul/li[4]/span[2]/text()'
+#    PRICE = ''  # could be "Sale Price" or "Your Price"
+#    RATING = '//*[@id="TurnToTopSummary"]/div[1]/div/div[1]'  # need CSS class
 
     def __init__(self):
         self.attributes = [
@@ -64,7 +65,7 @@ class DriverScraper(Scraper):
 
     def run(self, path):
         tree = self._get_tree(path)
-        attr = {}
+        attr = {"data_source": self.URL + path}
         for _attr in self.attributes:
             val = tree.xpath(_attr[1])[0]
             if _attr[2] is not None:
