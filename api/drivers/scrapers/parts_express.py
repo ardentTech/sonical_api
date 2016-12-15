@@ -44,7 +44,6 @@ class DriverScraper(Scraper):
     RMS_POWER = '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[1]/ul/li[2]/span[2]/text()'
     SENSITIVITY = '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[1]/ul/li[8]/span[2]/text()'
     VOICE_COIL_INDUCTANCE = '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[2]/ul/li[4]/span[2]/text()'
-#    PRICE = ''  # could be "Sale Price" or "Your Price"
 #    RATING = '//*[@id="TurnToTopSummary"]/div[1]/div/div[1]'  # need CSS class
 
     def __init__(self):
@@ -84,6 +83,8 @@ class DriverScraper(Scraper):
 class DriverListScraper(Scraper):
 
     DRIVER_DETAIL_XPATH = '//a[@id="GridViewProdLink"]/@href'
+# @todo figure out how to grab price while looping through drivers on 96
+#    DRIVER_PRICE = '//*[@id="ctl00_ctl00_MainContent_uxEBCategory_uxEBProductList_uxProductListing_dlProductsGridView_ctl00_divPriceBox"]/div/span[2]/text()'
     NEXT_PAGE_XPATH = '//a[@id="ctl00_ctl00_MainContent_uxEBCategory_uxEBProductList_uxBottomPagingLinks_aNextNav"]/@href'
 
     def __init__(self):
@@ -93,6 +94,7 @@ class DriverListScraper(Scraper):
         tree = self._get_tree(path)
 
         for driver in tree.xpath(self.DRIVER_DETAIL_XPATH):
+            # @todo might want to grab price here
             self.data.append(driver)
 
         return self.data

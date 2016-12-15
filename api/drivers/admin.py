@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Driver
+from .models import Driver, DriverGroup
 
 
 class DriverAdmin(admin.ModelAdmin):
@@ -48,4 +48,23 @@ class DriverAdmin(admin.ModelAdmin):
     search_fields = ("model",)
 
 
+class DriverGroupAdmin(admin.ModelAdmin):
+    fieldsets = (
+        (None, {
+            "fields": (
+                "drivers",
+                "name"
+            )
+        }),
+        ("Meta", {
+            "classes": ("grp-collapse",),
+            "fields": ("created", "id", "modified",)
+        })
+    )
+    list_display = ("id", "name", "created", "modified",)
+    readonly_fields = ("created", "id", "modified",)
+    search_fields = ("name",)
+
+
 admin.site.register(Driver, DriverAdmin)
+admin.site.register(DriverGroup, DriverGroupAdmin)

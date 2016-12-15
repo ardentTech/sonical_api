@@ -99,6 +99,7 @@ class Driver(Creatable, Modifiable):
 #    depth
 #    bolt_circle_diameter
 #    mounting_holes_count
+#    slug?
 
     class Meta:
         ordering = ["model"]
@@ -109,3 +110,16 @@ class Driver(Creatable, Modifiable):
 #    def validate_unique(self, exclude=None):
         # @todo validate model + manufacturer.name? part number?
 #        pass
+
+
+class DriverGroup(Creatable, Modifiable):
+
+    drivers = models.ManyToManyField(
+        "drivers.Driver", blank=True, verbose_name=_("drivers"))
+    name = models.CharField(_("name"), max_length=128)
+
+    class Meta:
+        ordering = ["id"]
+
+    def __str__(self):
+        return "{0} {1}".format(self.id, self.name)

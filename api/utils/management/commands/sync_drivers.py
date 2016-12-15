@@ -1,8 +1,11 @@
 from django.core.management.base import BaseCommand
 
-# from drivers.models import Driver
+from drivers.models import Driver
 from drivers.scrapers import PartsExpressScraper
 from manufacturing.models import Manufacturer
+
+
+# @todo if driver already exists (check `data_source` attr), do not create it on 22
 
 
 class Command(BaseCommand):
@@ -11,6 +14,7 @@ class Command(BaseCommand):
 
     def __init__(self, *args, **kwargs):
         super(Command, self).__init__(*args, **kwargs)
+        self.drivers = Driver.objects.values_list("data_source", flat=True)
         self.manufacturers = {m.name: m for m in Manufacturer.objects.all()}
 
     def handle(self, *args, **kwargs):

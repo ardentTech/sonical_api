@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Driver
+from .models import Driver, DriverGroup
 from manufacturing.serializers import ManufacturerSerializer
 
 
@@ -28,4 +28,22 @@ class DriverSerializer(serializers.ModelSerializer):
             "voice_coil_inductance",
         )
         model = Driver
+        read_only_fields = ("created", "id", "modified",)
+
+
+# @todo only nested DriverSerializer on DriverGroup detail requests? use 'count'
+# for lists?
+class DriverGroupSerializer(serializers.ModelSerializer):
+
+    drivers = DriverSerializer(many=True)
+
+    class Meta:
+        fields = (
+            "created",
+            "drivers",
+            "id",
+            "modified",
+            "name",
+        )
+        model = DriverGroup
         read_only_fields = ("created", "id", "modified",)

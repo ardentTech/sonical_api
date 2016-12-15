@@ -18,13 +18,17 @@ from django.contrib import admin
 
 from rest_framework import routers
 
-from drivers.views import DriverViewSet
+from drivers.views import DriverViewSet, DriverGroupViewSet
 
 router = routers.DefaultRouter()
 router.register(
     r"drivers",
     DriverViewSet,
     base_name="driver")
+router.register(
+    r"drivers/groups",
+    DriverGroupViewSet,
+    base_name="drivergroup")
 
 urlpatterns = [
     url(r"^v1/", include(router.urls, namespace="api")),
