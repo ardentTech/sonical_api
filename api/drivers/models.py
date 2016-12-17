@@ -130,6 +130,7 @@ class DriverProductListing(ProductListing):
 
     driver = models.ForeignKey(
         "drivers.Driver",
+        related_name="driver_product_listings",
         verbose_name=_("driver"))
 
     class Meta:

@@ -1,12 +1,27 @@
 from rest_framework import serializers
 
-from .models import Driver, DriverGroup
+from .models import Driver, DriverGroup, DriverProductListing
 from manufacturing.serializers import ManufacturerSerializer
+
+
+class DriverProductListingSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        fields = (
+            "created",
+            "id",
+            "modified",
+            "path",
+            "price",
+        )
+        model = DriverProductListing
+        read_only_fields = ("created", "id", "modified",)
 
 
 class DriverSerializer(serializers.ModelSerializer):
 
     manufacturer = ManufacturerSerializer()
+    driver_product_listings = DriverProductListingSerializer(many=True)
 
     class Meta:
         fields = (
@@ -22,6 +37,7 @@ class DriverSerializer(serializers.ModelSerializer):
             "modified",
             "nominal_diameter",
             "nominal_impedance",
+            "driver_product_listings",
             "resonant_frequency",
             "rms_power",
             "sensitivity",
@@ -31,8 +47,6 @@ class DriverSerializer(serializers.ModelSerializer):
         read_only_fields = ("created", "id", "modified",)
 
 
-# @todo only nested DriverSerializer on DriverGroup detail requests? use 'count'
-# for lists?
 class DriverGroupSerializer(serializers.ModelSerializer):
 
     drivers = DriverSerializer(many=True)

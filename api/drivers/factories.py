@@ -30,7 +30,7 @@ class DriverGroupFactory(factory.DjangoModelFactory):
 
 class DriverProductListingFactory(factory.DjangoModelFactory):
 
-    driver = DriverFactory()
+#    driver = DriverFactory()
 
     class Meta:
         model = "drivers.DriverProductListing"
