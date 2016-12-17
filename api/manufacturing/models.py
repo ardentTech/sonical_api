@@ -16,7 +16,7 @@ class Manufacturer(Creatable, Modifiable):
         blank=True)
 
     class Meta:
-        ordering = ["id"]
+        ordering = ["name"]
 
     def __str__(self):
         return self.name
@@ -31,7 +31,7 @@ class Material(Creatable, Modifiable):
         unique=True)
 
     class Meta:
-        ordering = ["id"]
+        ordering = ["name"]
 
     def __str__(self):
         return self.name

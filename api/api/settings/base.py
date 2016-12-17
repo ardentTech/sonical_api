@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     # app
     "drivers",
     "manufacturing",
+    "products",
     "utils",
 ]
 

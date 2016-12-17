@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from products.models import ProductListing
 from utils.models import Creatable, Modifiable
 
 
@@ -123,3 +124,16 @@ class DriverGroup(Creatable, Modifiable):
 
     def __str__(self):
         return "{0} {1}".format(self.id, self.name)
+
+
+class DriverProductListing(ProductListing):
+
+    driver = models.ForeignKey(
+        "drivers.Driver",
+        verbose_name=_("driver"))
+
+    class Meta:
+        ordering = ["id"]
+
+    def __str__(self):
+        return "{0} {1}".format(self.dealer.name, self.driver.model)

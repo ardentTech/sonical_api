@@ -26,3 +26,11 @@ class DriverGroupFactory(factory.DjangoModelFactory):
         if extracted:
             for driver in extracted:
                 self.drivers.add(driver)
+
+
+class DriverProductListingFactory(factory.DjangoModelFactory):
+
+    driver = DriverFactory()
+
+    class Meta:
+        model = "drivers.DriverProductListing"
