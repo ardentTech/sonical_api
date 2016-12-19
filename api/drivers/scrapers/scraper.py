@@ -7,6 +7,7 @@ import requests
 SCRAPER_ID = "Sonical Scraper 1.0 (jonathan@ardent.tech)"
 
 
+# @todo report unprocessed/processed totals
 class Scraper(object):
 
     def run(self, path):
