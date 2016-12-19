@@ -5,11 +5,12 @@ from .scraper import Scraper
 
 
 # @todo scrape driver price, rating and review #
-# @todo need some sort of dev mode
 # @todo multithreading
 # @todo adjust XPATH patterns to match by text instead of just position indexes
 
 
+DEV_MODE = "dev"
+PRO_MODE = "pro"
 URL = "https://www.parts-express.com"
 XPATH_PATTERNS = {
     "DC_RESISTANCE": '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[2]/ul/li[2]/span[2]/text()',
@@ -33,10 +34,27 @@ XPATH_PATTERNS = {
 
 class DriverScraper(Scraper):
 
-    def __init__(self):
-        # @todo is there a way to determine these programmatically from the model
-        # instead of writing all this out?
-        _attrs = [
+    def __init__(self, mode):
+        _attrs = self._get_driver_attrs()
+        self.driver_attrs = [
+            {"key": attr[0], "pattern": attr[1], "sanitizer": attr[2]} for attr in _attrs]
+
+        self.data = {}
+
+    def run(self, path):
+        self.data["data_source"] = URL + path
+        tree = self._get_tree(self.data["data_source"])
+
+        for attr in self.driver_attrs:
+            val = tree.xpath(attr["pattern"])[0]
+            if attr["sanitizer"] is not None:
+                val = attr["sanitizer"](val)
+            self.data[attr["key"]] = val
+
+        return self.data
+
+    def _get_driver_attrs(self):
+        return [
             ("dc_resistance", XPATH_PATTERNS["DC_RESISTANCE"], self._to_decimal),
             ("electromagnetic_q", XPATH_PATTERNS["ELECTROMAGNETIC_Q"], None),
             ("manufacturer", XPATH_PATTERNS["MANUFACTURER"], None),
@@ -49,20 +67,6 @@ class DriverScraper(Scraper):
             ("rms_power", XPATH_PATTERNS["RMS_POWER"], self._to_int),
             ("sensitivity", XPATH_PATTERNS["SENSITIVITY"], self._to_decimal),
             ("voice_coil_inductance", XPATH_PATTERNS["VOICE_COIL_INDUCTANCE"], self._to_decimal)]
-        self.driver_attrs = [
-            {"key": attr[0], "pattern": attr[1], "sanitizer": attr[2]} for attr in _attrs]
-
-    def run(self, path):
-        data = {"data_source": URL + path}
-        tree = self._get_tree(data["data_source"])
-
-        for attr in self.driver_attrs:
-            val = tree.xpath(attr["pattern"])[0]
-            if attr["sanitizer"] is not None:
-                val = attr["sanitizer"](val)
-            data[attr["key"]] = val
-
-        return data
 
     def _to_decimal(self, val):
         return Decimal(val.split(" ")[0])
@@ -73,8 +77,9 @@ class DriverScraper(Scraper):
 
 class DriverListScraper(Scraper):
 
-    def __init__(self):
+    def __init__(self, mode):
         self.data = []
+        self.should_paginate = False if mode == DEV_MODE else True
 
     def run(self, path):
         tree = self._get_tree(URL + path)
@@ -82,20 +87,29 @@ class DriverListScraper(Scraper):
         for driver in tree.xpath(XPATH_PATTERNS["DRIVER_DETAIL_XPATH"]):
             self.data.append(driver)
 
-        # crawl pagination
-        try:
-            return self.run(tree.xpath(XPATH_PATTERNS["NEXT_PAGE_XPATH"])[0])
-        except IndexError:
-            return self.data
+        if self.should_paginate:
+            try:
+                return self.run(tree.xpath(XPATH_PATTERNS["NEXT_PAGE_XPATH"])[0])
+            except IndexError:
+                return self.data
 
         return self.data
 
 
 class CategoryListScraper(Scraper):
 
+    def __init__(self, mode):
+        self.data = []
+        self.mode = mode
+
     def run(self, path):
         categories = self._get_tree(URL + path).xpath(XPATH_PATTERNS["DRIVER_CATEGORY_XPATH"])
-        return [c for c in categories if not re.search(r'replace|recone', c)]
+        self.data = [c for c in categories if not re.search(r'replace|recone', c)]
+
+        if self.mode == DEV_MODE:
+            self.data = self.data[:1]
+
+        return self.data
 
 
 class PartsExpressScraper(Scraper):
@@ -103,16 +117,14 @@ class PartsExpressScraper(Scraper):
     INITIAL_CATEGORY_PATH = "/cat/hi-fi-woofers-subwoofers-midranges-tweeters/13"
 
     def __init__(self):
-        self.category_list_scraper = CategoryListScraper()
-        self.driver_list_scraper = DriverListScraper()
-        self.driver_scraper = DriverScraper()
+        # @todo this should be an arg later
+        self.mode = DEV_MODE
 
     def run(self):
         drivers = []
 
-        for cp in self.category_list_scraper.run(self.INITIAL_CATEGORY_PATH):
-            driver_paths = self.driver_list_scraper.run(cp)
-            for dp in driver_paths:
-                drivers.append(self.scrapers["driver"].run(dp))
+        for cp in CategoryListScraper(mode=self.mode).run(self.INITIAL_CATEGORY_PATH):
+            for dp in DriverListScraper(mode=self.mode).run(cp):
+                drivers.append(DriverScraper(mode=self.mode).run(dp))
 
         return drivers
