@@ -3,6 +3,7 @@
 DB_NAME="sonical"
 PM="python manage.py"
 PROJ="$(pwd)/api"
+# @todo this should be an arg
 SETTINGS="--settings=api.settings.dev"
 
 # @todo throw an error when no arg is passed in
