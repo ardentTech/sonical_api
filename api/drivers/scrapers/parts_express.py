@@ -1,32 +1,17 @@
 from decimal import Decimal
 import re
-from time import sleep
 
-from lxml import html
-import requests
+from .scraper import Scraper
 
 
 # @todo scrape driver price, rating and review #
 # @todo need some sort of dev mode
 # @todo multithreading
-# @todo move XPATH patterns to separate module?
 # @todo adjust XPATH patterns to match by text instead of just position indexes
 
 
-class Scraper(object):
-
-    SCRAPER_ID = "Sonical Scraper 1.0 (jonathan@ardent.tech)"
-    URL = "https://www.parts-express.com"
-
-    def run(self, path):
-        raise Exception("Sub-classes of Scraper must implement `run(self, path)`")
-
-    def _get_tree(self, path):
-        headers = {"user-agent": self.SCRAPER_ID}
-        page = requests.get(self.URL + path, headers=headers)
-        tree = html.fromstring(page.content)
-        sleep(1)
-        return tree
+URL = "https://www.parts-express.com"
+XPATH_PATTERNS = {}  # @todo
 
 
 class DriverScraper(Scraper):
@@ -63,8 +48,9 @@ class DriverScraper(Scraper):
             ("voice_coil_inductance", self.VOICE_COIL_INDUCTANCE, self._sanitize_decimal)]
 
     def run(self, path):
-        tree = self._get_tree(path)
-        attr = {"data_source": self.URL + path}
+        url = URL + path
+        tree = self._get_tree(url)
+        attr = {"data_source": url}
         for _attr in self.attributes:
             val = tree.xpath(_attr[1])[0]
             if _attr[2] is not None:
@@ -91,18 +77,19 @@ class DriverListScraper(Scraper):
         self.data = []
 
     def run(self, path):
-        tree = self._get_tree(path)
+        tree = self._get_tree(URL + path)
 
         for driver in tree.xpath(self.DRIVER_DETAIL_XPATH):
             # @todo might want to grab price here
             self.data.append(driver)
 
-        return self.data
         # crawl pagination
         try:
             return self.run(tree.xpath(self.NEXT_PAGE_XPATH)[0])
         except IndexError:
             return self.data
+
+        return self.data
 
 
 class CategoryListScraper(Scraper):
@@ -110,26 +97,27 @@ class CategoryListScraper(Scraper):
     DRIVER_CATEGORY_XPATH = '//a[@id="lbCategoryName"]/@href'
 
     def run(self, path):
-        tree = self._get_tree(path)
+        tree = self._get_tree(URL + path)
         categories = tree.xpath(self.DRIVER_CATEGORY_XPATH)
         return [c for c in categories if not re.search(r'replace|recone', c)]
 
 
 class PartsExpressScraper(Scraper):
 
-    CATEGORY_LIST_PATH = "/cat/hi-fi-woofers-subwoofers-midranges-tweeters/13"
+    INITIAL_CATEGORY_PATH = "/cat/hi-fi-woofers-subwoofers-midranges-tweeters/13"
 
+    # @todo this should report how many of each processed/unprocessed
+    # @todo this should accept a `config` dict
     def __init__(self):
-        self.scrapers = {
-            "category_list": CategoryListScraper(),
-            "driver_list": DriverListScraper(),
-            "driver": DriverScraper()}
+        self.category_list_scraper = CategoryListScraper()
+        self.driver_list_scraper = DriverListScraper()
+        self.driver_scraper = DriverScraper()
 
     def run(self):
         drivers = []
-        category_paths = self.scrapers["category_list"].run(self.CATEGORY_LIST_PATH)
-        for cp in category_paths:
-            driver_paths = self.scrapers["driver_list"].run(cp)
+
+        for cp in self.category_list_scraper.run(self.INITIAL_CATEGORY_PATH):
+            driver_paths = self.driver_list_scraper.run(cp)
             for dp in driver_paths:
                 drivers.append(self.scrapers["driver"].run(dp))
 
