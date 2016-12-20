@@ -2,13 +2,12 @@ import json
 
 from django.core.urlresolvers import reverse
 
-from rest_framework.test import APITestCase
-
 from .factories import DriverFactory, DriverGroupFactory
 from manufacturing.factories import ManufacturerFactory
+from utils.testing import BaseAPITestCase
 
 
-class DriverListTestCase(APITestCase):
+class DriverListTestCase(BaseAPITestCase):
 
     def test_get_ok(self):
         for i in range(3):
@@ -20,7 +19,7 @@ class DriverListTestCase(APITestCase):
             json.loads(response.content.decode("utf-8"))["count"], 3)
 
 
-class DriverListSearchTestCase(APITestCase):
+class DriverListSearchTestCase(BaseAPITestCase):
 
     def test_get_model_ok(self):
         DriverFactory.create(model="Alpair 6M")
@@ -33,7 +32,7 @@ class DriverListSearchTestCase(APITestCase):
             json.loads(response.content.decode("utf-8"))["count"], 1)
 
 
-class DriverListFilterTestCase(APITestCase):
+class DriverListFilterTestCase(BaseAPITestCase):
 
     def test_get_dc_resistance_ok(self):
         DriverFactory.create(dc_resistance=2.00)
@@ -170,7 +169,7 @@ class DriverListFilterTestCase(APITestCase):
             json.loads(response.content.decode("utf-8"))["count"], 1)
 
 
-class DriverGroupListTestCase(APITestCase):
+class DriverGroupListTestCase(BaseAPITestCase):
 
     def test_get_ok(self):
         DriverGroupFactory.create(drivers=(DriverFactory.create(),))
@@ -181,8 +180,17 @@ class DriverGroupListTestCase(APITestCase):
         self.assertEqual(
             json.loads(response.content.decode("utf-8"))["count"], 2)
 
+    def test_post_invalid(self):
+        response = self.client.post(reverse("api:drivergroup-list"), data={}, format="json")
+        self.assertEqual(response.status_code, 400)
 
-class DriverGroupListSearchTestCase(APITestCase):
+    def test_post_ok(self):
+        payload = DriverGroupFactory.attributes()
+        response = self.client.post(reverse("api:drivergroup-list"), data=payload, format="json")
+        self.assertEqual(response.status_code, 201)
+
+
+class DriverGroupListSearchTestCase(BaseAPITestCase):
 
     def test_get_name_ok(self):
         name = "custom"

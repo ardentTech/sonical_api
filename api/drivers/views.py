@@ -15,7 +15,7 @@ class DriverViewSet(mixins.ListModelMixin, GenericViewSet):
     serializer_class = DriverSerializer
 
 
-class DriverGroupViewSet(mixins.ListModelMixin, GenericViewSet):
+class DriverGroupViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, GenericViewSet):
 
     queryset = DriverGroup.objects.all()
     search_fields = ("name",)

@@ -49,7 +49,7 @@ class DriverSerializer(serializers.ModelSerializer):
 
 class DriverGroupSerializer(serializers.ModelSerializer):
 
-    drivers = DriverSerializer(many=True)
+    drivers = DriverSerializer(allow_null=True, many=True, read_only=True)
 
     class Meta:
         fields = (
