@@ -1,5 +1,3 @@
-import json
-
 from django.core.urlresolvers import reverse
 
 from .factories import DriverFactory, DriverGroupFactory
@@ -14,9 +12,7 @@ class DriverListTestCase(BaseAPITestCase):
             DriverFactory.create()
 
         response = self.client.get(reverse("api:driver-list"))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            json.loads(response.content.decode("utf-8"))["count"], 3)
+        self.assert_get_ok(response, count=3)
 
 
 class DriverListSearchTestCase(BaseAPITestCase):
@@ -27,9 +23,7 @@ class DriverListSearchTestCase(BaseAPITestCase):
 
         response = self.client.get(
             reverse("api:driver-list") + "?search=pluv")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            json.loads(response.content.decode("utf-8"))["count"], 1)
+        self.assert_get_ok(response, count=1)
 
 
 class DriverListFilterTestCase(BaseAPITestCase):
@@ -40,9 +34,7 @@ class DriverListFilterTestCase(BaseAPITestCase):
 
         response = self.client.get(
             reverse("api:driver-list") + "?dc_resistance=2.00")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            json.loads(response.content.decode("utf-8"))["count"], 1)
+        self.assert_get_ok(response, count=1)
 
     def test_get_electromagnetic_q_ok(self):
         DriverFactory.create(electromagnetic_q=2.00)
@@ -50,9 +42,7 @@ class DriverListFilterTestCase(BaseAPITestCase):
 
         response = self.client.get(
             reverse("api:driver-list") + "?electromagnetic_q=2.00")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            json.loads(response.content.decode("utf-8"))["count"], 1)
+        self.assert_get_ok(response, count=1)
 
     def test_get_in_production_ok(self):
         DriverFactory.create(in_production=True)
@@ -61,9 +51,7 @@ class DriverListFilterTestCase(BaseAPITestCase):
         # @todo find a way to use lowercase 'true' in query param
         response = self.client.get(
             reverse("api:driver-list") + "?in_production=True")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            json.loads(response.content.decode("utf-8"))["count"], 1)
+        self.assert_get_ok(response, count=1)
 
     def test_get_manufacturer_ok(self):
         dayton_audio = ManufacturerFactory.create(name="Dayton Audio")
@@ -73,9 +61,7 @@ class DriverListFilterTestCase(BaseAPITestCase):
 
         response = self.client.get(
             reverse("api:driver-list") + "?manufacturer=MarkAudio")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            json.loads(response.content.decode("utf-8"))["count"], 1)
+        self.assert_get_ok(response, count=1)
 
     def test_get_max_power_ok(self):
         DriverFactory.create(max_power=60)
@@ -83,9 +69,7 @@ class DriverListFilterTestCase(BaseAPITestCase):
 
         response = self.client.get(
             reverse("api:driver-list") + "?max_power=60")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            json.loads(response.content.decode("utf-8"))["count"], 1)
+        self.assert_get_ok(response, count=1)
 
     def test_get_mechanical_q_ok(self):
         DriverFactory.create(mechanical_q=2.00)
@@ -93,9 +77,7 @@ class DriverListFilterTestCase(BaseAPITestCase):
 
         response = self.client.get(
             reverse("api:driver-list") + "?mechanical_q=2.00")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            json.loads(response.content.decode("utf-8"))["count"], 1)
+        self.assert_get_ok(response, count=1)
 
     def test_get_model_ok(self):
         DriverFactory.create(model="Pluvia")
@@ -104,9 +86,7 @@ class DriverListFilterTestCase(BaseAPITestCase):
         # @todo this is exact and case-sensitive. loosen those restrictions.
         response = self.client.get(
             reverse("api:driver-list") + "?model=Testing")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            json.loads(response.content.decode("utf-8"))["count"], 1)
+        self.assert_get_ok(response, count=1)
 
     def test_get_nominal_diameter_ok(self):
         DriverFactory.create(nominal_diameter=4)
@@ -114,9 +94,7 @@ class DriverListFilterTestCase(BaseAPITestCase):
 
         response = self.client.get(
             reverse("api:driver-list") + "?nominal_diameter=5")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            json.loads(response.content.decode("utf-8"))["count"], 1)
+        self.assert_get_ok(response, count=1)
 
     def test_get_nominal_impedance_ok(self):
         DriverFactory.create(nominal_impedance=4)
@@ -124,9 +102,7 @@ class DriverListFilterTestCase(BaseAPITestCase):
 
         response = self.client.get(
             reverse("api:driver-list") + "?nominal_impedance=4")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            json.loads(response.content.decode("utf-8"))["count"], 1)
+        self.assert_get_ok(response, count=1)
 
     def test_get_resonant_frequency_ok(self):
         DriverFactory.create(resonant_frequency=120)
@@ -134,9 +110,7 @@ class DriverListFilterTestCase(BaseAPITestCase):
 
         response = self.client.get(
             reverse("api:driver-list") + "?resonant_frequency=80")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            json.loads(response.content.decode("utf-8"))["count"], 1)
+        self.assert_get_ok(response, count=1)
 
     def test_get_rms_power_ok(self):
         DriverFactory.create(rms_power=60)
@@ -144,9 +118,7 @@ class DriverListFilterTestCase(BaseAPITestCase):
 
         response = self.client.get(
             reverse("api:driver-list") + "?rms_power=100")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            json.loads(response.content.decode("utf-8"))["count"], 1)
+        self.assert_get_ok(response, count=1)
 
     def test_get_sensitivity_ok(self):
         DriverFactory.create(sensitivity=90.1)
@@ -154,9 +126,7 @@ class DriverListFilterTestCase(BaseAPITestCase):
 
         response = self.client.get(
             reverse("api:driver-list") + "?sensitivity=90.1")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            json.loads(response.content.decode("utf-8"))["count"], 1)
+        self.assert_get_ok(response, count=1)
 
     def test_get_voice_coil_inductance_ok(self):
         DriverFactory.create(voice_coil_inductance=0.60)
@@ -164,9 +134,7 @@ class DriverListFilterTestCase(BaseAPITestCase):
 
         response = self.client.get(
             reverse("api:driver-list") + "?voice_coil_inductance=0.60")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            json.loads(response.content.decode("utf-8"))["count"], 1)
+        self.assert_get_ok(response, count=1)
 
 
 class DriverGroupListTestCase(BaseAPITestCase):
@@ -176,18 +144,17 @@ class DriverGroupListTestCase(BaseAPITestCase):
         DriverGroupFactory.create(drivers=(DriverFactory.create(),))
 
         response = self.client.get(reverse("api:drivergroup-list"))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            json.loads(response.content.decode("utf-8"))["count"], 2)
+        self.assert_get_ok(response, count=2)
 
     def test_post_invalid(self):
         response = self.client.post(reverse("api:drivergroup-list"), data={}, format="json")
-        self.assertEqual(response.status_code, 400)
+        self.assert_bad_request(response)
 
     def test_post_ok(self):
         payload = DriverGroupFactory.attributes()
+        payload["drivers"] = [DriverFactory.create().id]
         response = self.client.post(reverse("api:drivergroup-list"), data=payload, format="json")
-        self.assertEqual(response.status_code, 201)
+        self.assert_post_ok(response)
 
 
 class DriverGroupListSearchTestCase(BaseAPITestCase):
@@ -202,6 +169,4 @@ class DriverGroupListSearchTestCase(BaseAPITestCase):
 
         response = self.client.get(
             reverse("api:drivergroup-list") + "?search={0}".format(name))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            json.loads(response.content.decode("utf-8"))["count"], 1)
+        self.assert_get_ok(response, count=1)
