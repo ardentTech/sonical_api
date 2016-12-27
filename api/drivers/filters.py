@@ -1,14 +1,13 @@
 import django_filters
-from django_filters.filters import BooleanFilter
-from django_filters.widgets import BooleanWidget
 
 from .models import Driver
+from utils.filter_fields import SonicalBooleanFilter
 
 
 # @todo allow gt lt gte lte in addition to equality
 class DriverFilter(django_filters.FilterSet):
 
-    in_production = BooleanFilter(widget=BooleanWidget)
+    in_production = SonicalBooleanFilter()
     manufacturer = django_filters.CharFilter(name="manufacturer__name")
 
     class Meta:
