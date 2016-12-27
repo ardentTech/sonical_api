@@ -48,9 +48,8 @@ class DriverListFilterTestCase(BaseAPITestCase):
         DriverFactory.create(in_production=True)
         DriverFactory.create(in_production=False)
 
-        # @todo find a way to use lowercase 'true' in query param
         response = self.client.get(
-            reverse("api:driver-list") + "?in_production=True")
+            reverse("api:driver-list") + "?in_production=true")
         self.assert_get_ok(response, count=1)
 
     def test_get_manufacturer_ok(self):
