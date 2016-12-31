@@ -96,9 +96,10 @@ WSGI_APPLICATION = 'api.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        "HOST": "127.0.0.1",
         'NAME': get_env_var("SONICAL_DB_NAME"),
-        'USER': get_env_var("SONICAL_DB_USER"),
         'PASSWORD': get_env_var("SONICAL_DB_PASSWORD"),
+        'USER': get_env_var("SONICAL_DB_USER"),
     }
 }
 

@@ -6,7 +6,8 @@ from django.conf import settings
 from .scraper import Scraper
 
 
-# @todo scrape driver price, rating and review #
+# @todo optimize xpath selections to use subselections instead of root element
+# @todo scrape driver rating and review #
 # @todo multithreading
 # @todo adjust XPATH patterns to match by text instead of just position indexes
 
@@ -26,6 +27,7 @@ class BasePartsExpressScraper(Scraper):
         "NEXT_PAGE": '//a[@id="ctl00_ctl00_MainContent_uxEBCategory_uxEBProductList_uxBottomPagingLinks_aNextNav"]/@href',
         "NOMINAL_DIAMETER": '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[1]/ul/li[1]/span[2]/text()',
         "NOMINAL_IMPEDANCE": '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[1]/ul/li[5]/span[2]/text()',
+        "PRICE": '//div[@class="PriceContBox"]/div[1]/div[1]/span[1]/span[2]/text()',
         "RESONANT_FREQUENCY": '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[2]/ul/li[1]/span[2]/text()',
         "REVIEW_COUNT": '//*[@id="TurnToTopSummary"]/div[1]/div/div[2]/a[1]/text()',
         "RMS_POWER": '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[1]/ul/li[2]/span[2]/text()',
@@ -68,6 +70,7 @@ class DriverScraper(BasePartsExpressScraper):
             ("model", self.XPATH["MODEL"], None),
             ("nominal_diameter", self.XPATH["NOMINAL_DIAMETER"], None),
             ("nominal_impedance", self.XPATH["NOMINAL_IMPEDANCE"], self._to_decimal),
+            ("price", self.XPATH["PRICE"], self._to_decimal),
             ("resonant_frequency", self.XPATH["RESONANT_FREQUENCY"], self._to_decimal),
             ("rms_power", self.XPATH["RMS_POWER"], self._to_int),
             ("sensitivity", self.XPATH["SENSITIVITY"], self._to_decimal),

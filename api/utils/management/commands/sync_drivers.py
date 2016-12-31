@@ -5,7 +5,10 @@ from drivers.scrapers import PartsExpressScraper
 from manufacturing.models import Manufacturer
 
 
+# @todo need a mode here. should it be handled here and then passed to all
+# scrapers?
 # @todo if driver already exists (check `data_source` attr), do not create it on 22
+# @todo driver["price"] belongs to the DriverProductListing and not the Driver
 
 
 class Command(BaseCommand):
@@ -19,8 +22,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         drivers = PartsExpressScraper().run()
-#        Driver.objects.bulk_create([self._expand_attrs(d) for d in drivers])
         print("{0}".format([self._expand_attrs(d) for d in drivers]))
+#        Driver.objects.bulk_create([self._expand_attrs(d) for d in drivers])
 
     def _expand_attrs(self, driver):
         name = driver["manufacturer"]
