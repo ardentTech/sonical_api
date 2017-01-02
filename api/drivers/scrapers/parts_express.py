@@ -6,34 +6,13 @@ from django.conf import settings
 from .scraper import Scraper
 
 
-# @todo optimize xpath selections to use subselections instead of root element
-# @todo scrape driver rating and review #
+# @todo scrape driver rating and review # (these are AJAX)
 # @todo multithreading
-# @todo adjust XPATH patterns to match by text instead of just position indexes
 
 
 class BasePartsExpressScraper(Scraper):
 
     URL = "https://www.parts-express.com"
-    XPATH = {
-        "DC_RESISTANCE": '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[2]/ul/li[2]/span[2]/text()',
-        "DRIVER_CATEGORY": '//a[@id="lbCategoryName"]/@href',
-        "DRIVER_DETAIL": '//a[@id="GridViewProdLink"]/@href',
-        "ELECTROMAGNETIC_Q": '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[2]/ul/li[7]/span[2]/text()',
-        "MANUFACTURER": '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[6]/ul/li[1]/span[2]/text()',
-        "MAX_POWER": '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[1]/ul/li[4]/span[2]/text()',
-        "MECHANICAL_Q": '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[2]/ul/li[5]/span[2]/text()',
-        "MODEL": '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[6]/ul/li[2]/span[2]/text()',
-        "NEXT_PAGE": '//a[@id="ctl00_ctl00_MainContent_uxEBCategory_uxEBProductList_uxBottomPagingLinks_aNextNav"]/@href',
-        "NOMINAL_DIAMETER": '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[1]/ul/li[1]/span[2]/text()',
-        "NOMINAL_IMPEDANCE": '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[1]/ul/li[5]/span[2]/text()',
-        "PRICE": '//div[@class="PriceContBox"]/div[1]/div[1]/span[1]/span[2]/text()',
-        "RESONANT_FREQUENCY": '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[2]/ul/li[1]/span[2]/text()',
-        "REVIEW_COUNT": '//*[@id="TurnToTopSummary"]/div[1]/div/div[2]/a[1]/text()',
-        "RMS_POWER": '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[1]/ul/li[2]/span[2]/text()',
-        "SENSITIVITY": '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[1]/ul/li[8]/span[2]/text()',
-        "VOICE_COIL_INDUCTANCE": '//*[@id="ctl00_ctl00_MainContent_uxProduct_pnlProductDetails"]/div[2]/div[3]/div[2]/ul/li[4]/span[2]/text()',
-    }
 
     def url_from_path(self, path):
         return self.URL + path
@@ -41,40 +20,47 @@ class BasePartsExpressScraper(Scraper):
 
 class DriverScraper(BasePartsExpressScraper):
 
-    def __init__(self, mode):
-        _attrs = self._get_driver_attrs()
-        self.driver_attrs = [
-            {"key": attr[0], "pattern": attr[1], "sanitizer": attr[2]} for attr in _attrs]
+    TARGETS = [
+        ('//div[@id="MiddleColumn1"]', [
+            # (key, xpath pattern, desired type)
+            ("price", 'div[@class="PriceContBox"]/div[1]/div[1]/span[1]/span[2]/text()', "decimal"),
+        ]),
+        ('//div[@class="ProducDetailsNote"]', [
+            # (key, table row column one text, to type)
+            ("dc_resistance", "DC Resistance (Re)", "decimal"),
+            ("electromagnetic_q", "Electromagnetic Q (Qes)", None),
+            ("manufacturer", "Brand", None),
+            ("max_power", "Power Handling (max)", "int"),
+            ("mechanical_q", "Mechanical Q (Qms)", None),
+            ("model", "Model", None),
+            ("nominal_diameter", "Nominal Diameter", None),
+            ("nominal_impedance", "Impedance", "decimal"),
+            ("resonant_frequency", "Resonant Frequency (Fs)", "decimal"),
+            ("rms_power", "Power Handling (RMS)", "int"),
+            ("sensitivity", "Sensitivity", "decimal"),
+            ("voice_coil_inductance", "Voice Coil Inductance (Le)", "decimal"),
+        ])
+    ]
 
+    def __init__(self, mode):
         self.data = {}
 
     def run(self, path):
-        self.data["data_source"] = self.url_from_path(path)
-        tree = self._get_tree(self.data["data_source"])
+        tree = self._get_tree(self.url_from_path(path))
 
-        for attr in self.driver_attrs:
-            val = tree.xpath(attr["pattern"])[0]
-            if attr["sanitizer"] is not None:
-                val = attr["sanitizer"](val)
-            self.data[attr["key"]] = val
+        for idx, section in enumerate(self.TARGETS):
+            root = tree.xpath(section[0])[0]
+            pattern = '{0}'
+            if idx == 1:
+                pattern = 'span[text()="{0}"]/following-sibling::span[1]/text()'
+
+            for items in section[1]:
+                val = root.xpath("//" + pattern.format(items[1]))[0]
+                if items[2]:
+                    val = getattr(self, "_to_" + items[2])(val)
+                self.data[items[0]] = val
 
         return self.data
-
-    def _get_driver_attrs(self):
-        return [
-            ("dc_resistance", self.XPATH["DC_RESISTANCE"], self._to_decimal),
-            ("electromagnetic_q", self.XPATH["ELECTROMAGNETIC_Q"], None),
-            ("manufacturer", self.XPATH["MANUFACTURER"], None),
-            ("max_power", self.XPATH["MAX_POWER"], self._to_int),
-            ("mechanical_q", self.XPATH["MECHANICAL_Q"], None),
-            ("model", self.XPATH["MODEL"], None),
-            ("nominal_diameter", self.XPATH["NOMINAL_DIAMETER"], None),
-            ("nominal_impedance", self.XPATH["NOMINAL_IMPEDANCE"], self._to_decimal),
-            ("price", self.XPATH["PRICE"], self._to_decimal),
-            ("resonant_frequency", self.XPATH["RESONANT_FREQUENCY"], self._to_decimal),
-            ("rms_power", self.XPATH["RMS_POWER"], self._to_int),
-            ("sensitivity", self.XPATH["SENSITIVITY"], self._to_decimal),
-            ("voice_coil_inductance", self.XPATH["VOICE_COIL_INDUCTANCE"], self._to_decimal)]
 
     def _to_decimal(self, val):
         return Decimal(val.split(" ")[0])
@@ -82,8 +68,16 @@ class DriverScraper(BasePartsExpressScraper):
     def _to_int(self, val):
         return int(val.split(" ")[0])
 
+    def _to_rating_int(self, val):
+        pass
+
 
 class DriverListScraper(BasePartsExpressScraper):
+
+    XPATH = {
+        "DRIVER_DETAIL": '//a[@id="GridViewProdLink"]/@href',
+        "NEXT_PAGE": '//a[@id="ctl00_ctl00_MainContent_uxEBCategory_uxEBProductList_uxBottomPagingLinks_aNextNav"]/@href',
+    }
 
     def __init__(self, mode):
         self.data = []
@@ -105,6 +99,10 @@ class DriverListScraper(BasePartsExpressScraper):
 
 
 class CategoryListScraper(BasePartsExpressScraper):
+
+    XPATH = {
+        "DRIVER_CATEGORY": '//a[@id="lbCategoryName"]/@href'
+    }
 
     def __init__(self, mode):
         self.data = []
