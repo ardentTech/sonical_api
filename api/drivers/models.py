@@ -7,9 +7,6 @@ from utils.models import Creatable, Modifiable
 
 class Driver(Creatable, Modifiable):
 
-    data_source = models.URLField(
-        _("Data Source"),
-        db_index=True)
     dc_resistance = models.DecimalField(
         _("DC Resistance (ohms)"),
         blank=True,
