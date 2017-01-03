@@ -20,14 +20,14 @@ class DriverScraper(BasePartsExpressScraper):
             ("price", 'div[@class="PriceContBox"]/div[1]/div[1]/span[1]/span[2]/text()', "decimal"),
         ]),
         ('//div[@class="ProducDetailsNote"]', [
-            # (key, table row column one text, to type)
+            # (key, table row column one text, cast to)
             ("dc_resistance", "DC Resistance (Re)", "decimal"),
-            ("electromagnetic_q", "Electromagnetic Q (Qes)", None),
+            ("electromagnetic_q", "Electromagnetic Q (Qes)", "decimal"),
             ("manufacturer", "Brand", None),
             ("max_power", "Power Handling (max)", "int"),
-            ("mechanical_q", "Mechanical Q (Qms)", None),
+            ("mechanical_q", "Mechanical Q (Qms)", "decimal"),
             ("model", "Model", None),
-            ("nominal_diameter", "Nominal Diameter", None),
+            ("nominal_diameter", "Nominal Diameter", "decimal"),
             ("nominal_impedance", "Impedance", "decimal"),
             ("resonant_frequency", "Resonant Frequency (Fs)", "decimal"),
             ("rms_power", "Power Handling (RMS)", "int"),
@@ -37,7 +37,7 @@ class DriverScraper(BasePartsExpressScraper):
     ]
 
     def run(self, path):
-        data = {}
+        data = {"path": path}
         tree = self.get_tree(self.url_from_path(path))
 
         for idx, section in enumerate(self.TARGETS):

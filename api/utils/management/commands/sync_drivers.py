@@ -1,12 +1,12 @@
 from django.core.management.base import BaseCommand
 
-from drivers.models import Driver
+from drivers.models import Driver, DriverProductListing
 from drivers.scrapers import PartsExpressScraper
 from manufacturing.models import Manufacturer
+from products.models import Dealer
 from utils.mixins.mode import ModeMixin
 
 
-# @todo associate a manufacturer to a driver
 # @todo how to efficiently create/update driver records?
 # @todo create/update product listing
 # @todo i think i need to pass the existing product listings to the appropriate
@@ -16,33 +16,44 @@ from utils.mixins.mode import ModeMixin
 
 class Command(ModeMixin, BaseCommand):
 
-    help = "Synchs local driver records with their remotes"
+    help = "Synchronizes local and remote driver data"
 
     def __init__(self, *args, **kwargs):
         super(Command, self).__init__(*args, **kwargs)
         self.manufacturers = {m.name: m for m in Manufacturer.objects.all()}
 
     def handle(self, *args, **kwargs):
-        self._scrape_parts_express()
+        scrapers = [PartsExpressScraper()]
+        for scraper in scrapers:
+            self._process_result(scraper.run())
 
-    def _scrape_parts_express(self):
-        results = PartsExpressScraper().run()
-        # @todo create scraping report here
-
-        if self.pro_mode():
-            Driver.objects.bulk_create(
-                [self._expand_attrs(driver) for driver in results["successes"]])
-        else:
-            print("Successes: {0}".format(len(results["successes"])))
-            print("Failures: {0}".format(len(results["failures"])))
-
-    def _expand_attrs(self, driver):
-        # @todo separated associated product listing price
-        key = "manufacturer"
-        name = driver[key]
+    def _get_manufacturer(self, name):
         try:
-            driver[key] = self.manufacturers[name]
+            return self.manufacturers[name]
         except:
             self.manufacturers[name] = Manufacturer.objects.create(name=name)
-            driver[key] = self.manufacturers[name]
-        return driver
+            return self.manufacturers[name]
+
+    def _process_result(self, result):
+        dealer, created = Dealer.objects.get_or_create(name="Parts Express")
+
+        if self.dev_mode():  # @todo change dev to pro
+            to_create = []
+            listing_attrs = []
+            for data in result["successes"]:
+                data["manufacturer"] = self._get_manufacturer(data["manufacturer"])
+                listing_attrs.append({
+                    "path": data.pop("path", None),
+                    "price": data.pop("price", None)})
+                to_create.append(Driver(**data))
+
+            created = Driver.objects.bulk_create(to_create)
+
+            del to_create[:]
+            for idx, driver in enumerate(created):
+                attrs = listing_attrs[idx]
+                attrs["dealer"] = dealer
+                attrs["driver"] = driver
+                to_create.append(DriverProductListing(**attrs))
+
+            DriverProductListing.objects.bulk_create(to_create)
