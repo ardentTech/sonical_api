@@ -55,7 +55,6 @@ class DriverScraper(BasePartsExpressScraper):
                 except:
                     pass
 
-        print("{0}".format(data))
         return data
 
     def _to_decimal(self, val):
@@ -114,10 +113,14 @@ class PartsExpressScraper(BasePartsExpressScraper):
     INITIAL_CATEGORY_PATH = "/cat/hi-fi-woofers-subwoofers-midranges-tweeters/13"
 
     def run(self):
-        data = []
+        results = {"failures": [], "successes": []}
 
+        # @todo use singletons here
         for cp in CategoryListScraper().run(self.INITIAL_CATEGORY_PATH):
             for dp in DriverListScraper().run(cp):
-                data.append(DriverScraper().run(dp))
+                try:
+                    results["successes"].append(DriverScraper().run(dp))
+                except Exception as e:
+                    results["failures"].append((dp, repr(e)))
 
-        return data
+        return results
