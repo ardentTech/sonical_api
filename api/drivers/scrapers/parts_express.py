@@ -1,13 +1,7 @@
 from decimal import Decimal
 import re
 
-from django.conf import settings
-
 from .scraper import Scraper
-
-
-# @todo scrape driver rating and review # (these are AJAX)
-# @todo multithreading
 
 
 class BasePartsExpressScraper(Scraper):
@@ -42,11 +36,9 @@ class DriverScraper(BasePartsExpressScraper):
         ])
     ]
 
-    def __init__(self, mode):
-        self.data = {}
-
     def run(self, path):
-        tree = self._get_tree(self.url_from_path(path))
+        data = {}
+        tree = self.get_tree(self.url_from_path(path))
 
         for idx, section in enumerate(self.TARGETS):
             root = tree.xpath(section[0])[0]
@@ -55,12 +47,16 @@ class DriverScraper(BasePartsExpressScraper):
                 pattern = 'span[text()="{0}"]/following-sibling::span[1]/text()'
 
             for items in section[1]:
-                val = root.xpath("//" + pattern.format(items[1]))[0]
-                if items[2]:
-                    val = getattr(self, "_to_" + items[2])(val)
-                self.data[items[0]] = val
+                try:
+                    val = root.xpath("//" + pattern.format(items[1]))[0]
+                    if items[2]:
+                        val = getattr(self, "_to_" + items[2])(val)
+                    data[items[0]] = val
+                except:
+                    pass
 
-        return self.data
+        print("{0}".format(data))
+        return data
 
     def _to_decimal(self, val):
         return Decimal(val.split(" ")[0])
@@ -68,30 +64,27 @@ class DriverScraper(BasePartsExpressScraper):
     def _to_int(self, val):
         return int(val.split(" ")[0])
 
-    def _to_rating_int(self, val):
-        pass
-
 
 class DriverListScraper(BasePartsExpressScraper):
 
-    XPATH = {
+    TARGETS = {
         "DRIVER_DETAIL": '//a[@id="GridViewProdLink"]/@href',
         "NEXT_PAGE": '//a[@id="ctl00_ctl00_MainContent_uxEBCategory_uxEBProductList_uxBottomPagingLinks_aNextNav"]/@href',
     }
 
-    def __init__(self, mode):
+    def __init__(self):
+        super(DriverListScraper, self).__init__()
         self.data = []
-        self.should_paginate = False if mode == self.DEV_MODE else True
 
     def run(self, path):
-        tree = self._get_tree(self.url_from_path(path))
+        tree = self.get_tree(self.url_from_path(path))
 
-        for driver in tree.xpath(self.XPATH["DRIVER_DETAIL"]):
+        for driver in tree.xpath(self.TARGETS["DRIVER_DETAIL"]):
             self.data.append(driver)
 
-        if self.should_paginate:
+        if self.pro_mode():
             try:
-                return self.run(tree.xpath(self.XPATH["NEXT_PAGE"])[0])
+                return self.run(tree.xpath(self.TARGETS["NEXT_PAGE"])[0])
             except IndexError:
                 return self.data
 
@@ -100,37 +93,31 @@ class DriverListScraper(BasePartsExpressScraper):
 
 class CategoryListScraper(BasePartsExpressScraper):
 
-    XPATH = {
+    TARGETS = {
         "DRIVER_CATEGORY": '//a[@id="lbCategoryName"]/@href'
     }
 
-    def __init__(self, mode):
-        self.data = []
-        self.mode = mode
-
     def run(self, path):
-        categories = self._get_tree(
+        categories = self.get_tree(
             self.url_from_path(path)).xpath(
-                self.XPATH["DRIVER_CATEGORY"])
-        self.data = [c for c in categories if not re.search(r'replace|recone', c)]
+                self.TARGETS["DRIVER_CATEGORY"])
+        data = [c for c in categories if not re.search(r'replace|recone', c)]
 
-        if self.mode == self.DEV_MODE:
-            self.data = self.data[:1]
+        if self.dev_mode():
+            data = data[:1]
 
-        return self.data
+        return data
 
 
 class PartsExpressScraper(BasePartsExpressScraper):
 
     INITIAL_CATEGORY_PATH = "/cat/hi-fi-woofers-subwoofers-midranges-tweeters/13"
 
-    def __init__(self):
-        self.data = []
-        self.mode = self.DEV_MODE if settings.DEBUG is True else self.PRO_MODE
-
     def run(self):
-        for cp in CategoryListScraper(mode=self.mode).run(self.INITIAL_CATEGORY_PATH):
-            for dp in DriverListScraper(mode=self.mode).run(cp):
-                self.data.append(DriverScraper(mode=self.mode).run(dp))
+        data = []
 
-        return self.data
+        for cp in CategoryListScraper().run(self.INITIAL_CATEGORY_PATH):
+            for dp in DriverListScraper().run(cp):
+                data.append(DriverScraper().run(dp))
+
+        return data
