@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib.humanize.templatetags.humanize import intcomma
 
 from .models import Driver, DriverGroup, DriverProductListing
 
@@ -35,17 +36,43 @@ class DriverAdmin(admin.ModelAdmin):
         "id",
         "model",
         "manufacturer",
-        "nominal_impedance",
-        "resonant_frequency",
-        "sensitivity",
-        "rms_power",
-        "max_power",
+        "_nominal_impedance",
+        "_resonant_frequency",
+        "_sensitivity",
+        "_rms_power",
+        "_max_power",
         "created",
         "modified",
     )
-    list_filter = ("in_production", "manufacturer",)
+    list_filter = ("in_production", "manufacturer", "nominal_impedance",)
     readonly_fields = ("created", "id", "modified",)
     search_fields = ("model",)
+
+    # @todo use general formatters like the client app
+    def _max_power(self, obj):
+        return str(obj.max_power) + " W"
+    _max_power.short_description = "Max power "
+    _max_power.admin_order_field = "max_power"
+
+    def _nominal_impedance(self, obj):
+        return str(obj.nominal_impedance) + "Ω"
+    _nominal_impedance.short_description = "Nominal Impedance"
+    _nominal_impedance.admin_order_field = "nominal_impedance"
+
+    def _resonant_frequency(self, obj):
+        return str(obj.resonant_frequency) + " Hz"
+    _resonant_frequency.short_description = "Resonant Frequency"
+    _resonant_frequency.admin_order_field = "resonant_frequency"
+
+    def _rms_power(self, obj):
+        return str(obj.rms_power) + " W"
+    _rms_power.short_description = "RMS power "
+    _rms_power.admin_order_field = "rms_power"
+
+    def _sensitivity(self, obj):
+        return str(obj.sensitivity) + " dB"
+    _sensitivity.short_description = "Sensitivity"
+    _sensitivity.admin_order_field = "sensitivity"
 
 
 class DriverGroupAdmin(admin.ModelAdmin):
@@ -81,8 +108,11 @@ class DriverProductListingAdmin(admin.ModelAdmin):
             "fields": ("created", "id", "modified",)
         })
     )
-    list_display = ("id", "price", "path", "created", "modified",)
+    list_display = ("id", "_price", "path", "created", "modified",)
     readonly_fields = ("created", "id", "modified",)
+
+    def _price(self, obj):
+        return "$" + str(intcomma(obj.price))
 
 
 admin.site.register(Driver, DriverAdmin)

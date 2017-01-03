@@ -20,26 +20,35 @@ class Command(ModeMixin, BaseCommand):
 
     def __init__(self, *args, **kwargs):
         super(Command, self).__init__(*args, **kwargs)
+        self.dealers = {d.name: d for d in Dealer.objects.all()}
         self.manufacturers = {m.name: m for m in Manufacturer.objects.all()}
 
     def handle(self, *args, **kwargs):
         scrapers = [PartsExpressScraper()]
         for scraper in scrapers:
-            self._process_result(scraper.run())
+            self._process_result(scraper.run(), scraper.LABEL)
+
+    def _get_dealer(self, name):
+        return self._get_or_create_by_name(self.dealers, Dealer, name)
 
     def _get_manufacturer(self, name):
+        return self._get_or_create_by_name(self.manufacturers, Manufacturer, name)
+
+    def _get_or_create_by_name(self, store, cls, name):
         try:
-            return self.manufacturers[name]
+            return store[name]
         except:
-            self.manufacturers[name] = Manufacturer.objects.create(name=name)
-            return self.manufacturers[name]
+            store[name] = cls.objects.create(name=name)
+            return store[name]
 
-    def _process_result(self, result):
-        dealer, created = Dealer.objects.get_or_create(name="Parts Express")
+    def _process_result(self, result, scraper_name):
+        self._report_result(result)
 
-        if self.dev_mode():  # @todo change dev to pro
+        if self.dev_mode():
+            dealer = self._get_dealer(scraper_name)
             to_create = []
             listing_attrs = []
+
             for data in result["successes"]:
                 data["manufacturer"] = self._get_manufacturer(data["manufacturer"])
                 listing_attrs.append({
@@ -48,6 +57,7 @@ class Command(ModeMixin, BaseCommand):
                 to_create.append(Driver(**data))
 
             created = Driver.objects.bulk_create(to_create)
+            print("Created {0} Drivers".format(len(created)))
 
             del to_create[:]
             for idx, driver in enumerate(created):
@@ -56,4 +66,9 @@ class Command(ModeMixin, BaseCommand):
                 attrs["driver"] = driver
                 to_create.append(DriverProductListing(**attrs))
 
-            DriverProductListing.objects.bulk_create(to_create)
+            created = DriverProductListing.objects.bulk_create(to_create)
+            print("Created {0} DriverProductListings".format(len(created)))
+
+    def _report_result(self, result):
+        print("Successfully scraped {0} drivers".format(len(result["successes"])))
+        print("Failed while scraping {0} drivers".format(len(result["failures"])))

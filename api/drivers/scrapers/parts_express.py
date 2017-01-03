@@ -37,6 +37,8 @@ class DriverScraper(BasePartsExpressScraper):
     ]
 
     def run(self, path):
+        if self.dev_mode():
+            print("Scraping {0}".format(path))
         data = {"path": path}
         tree = self.get_tree(self.url_from_path(path))
 
@@ -111,6 +113,7 @@ class CategoryListScraper(BasePartsExpressScraper):
 class PartsExpressScraper(BasePartsExpressScraper):
 
     INITIAL_CATEGORY_PATH = "/cat/hi-fi-woofers-subwoofers-midranges-tweeters/13"
+    LABEL = "Parts Express"
 
     def run(self):
         results = {"failures": [], "successes": []}
