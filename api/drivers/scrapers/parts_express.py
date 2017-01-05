@@ -16,11 +16,11 @@ class DriverScraper(BasePartsExpressScraper):
 
     TARGETS = [
         ('//div[@id="MiddleColumn1"]', [
-            # (key, xpath pattern, desired type)
+            # (key, xpath pattern, formatter)
             ("price", 'div[@class="PriceContBox"]/div[1]/div[1]/span[1]/span[2]/text()', "decimal"),
         ]),
         ('//div[@class="ProducDetailsNote"]', [
-            # (key, table row column one text, cast to)
+            # (key, table row column one text, formatter)
             ("dc_resistance", "DC Resistance (Re)", "decimal"),
             ("electromagnetic_q", "Electromagnetic Q (Qes)", "decimal"),
             ("manufacturer", "Brand", None),
@@ -88,6 +88,8 @@ class DriverListScraper(BasePartsExpressScraper):
                 return self.run(tree.xpath(self.TARGETS["NEXT_PAGE"])[0])
             except IndexError:
                 return self.data
+            except:
+                raise
 
         return self.data
 
@@ -100,8 +102,7 @@ class CategoryListScraper(BasePartsExpressScraper):
 
     def run(self, path):
         categories = self.get_tree(
-            self.url_from_path(path)).xpath(
-                self.TARGETS["DRIVER_CATEGORY"])
+            self.url_from_path(path)).xpath(self.TARGETS["DRIVER_CATEGORY"])
         data = [c for c in categories if not re.search(r'replace|recone', c)]
 
         if self.dev_mode():
@@ -117,12 +118,12 @@ class PartsExpressScraper(BasePartsExpressScraper):
 
     def run(self):
         results = {"failures": [], "successes": []}
+        driverScraper = DriverScraper()
 
-        # @todo use singletons here
         for cp in CategoryListScraper().run(self.INITIAL_CATEGORY_PATH):
             for dp in DriverListScraper().run(cp):
                 try:
-                    results["successes"].append(DriverScraper().run(dp))
+                    results["successes"].append(driverScraper.run(dp))
                 except Exception as e:
                     results["failures"].append((dp, repr(e)))
 
