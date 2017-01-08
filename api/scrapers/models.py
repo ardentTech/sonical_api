@@ -14,8 +14,12 @@ class Scraper(Creatable, Modifiable):
         _("file path"),
         max_length=128,
         validators=[validate_file_path])
+    is_active = models.BooleanField(
+        _("is active"),
+        default=False)
 
     class Meta:
+        abstract = True
         ordering = ["name"]
 
     def __str__(self):
@@ -30,11 +34,9 @@ class ScraperReport(Creatable):
     processed = models.PositiveIntegerField(
         _("processed"),
         default=0)
-    scraper = models.ForeignKey(
-        "scrapers.Scraper",
-        verbose_name=_("scraper"))
 
     class Meta:
+        abstract = True
         ordering = ["-id"]
 
     def __str__(self):

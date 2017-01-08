@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from scrapers.models import Scraper, ScraperReport
 from utils.models import Creatable, Modifiable
 
 
@@ -24,6 +25,21 @@ class Dealer(Creatable, Modifiable):
     def save(self, *args, **kwargs):
         self.website.rstrip("/")
         super(Dealer, self).save(*args, **kwargs)
+
+
+# @todo grab `name` automatically from Dealer
+class DealerScraper(Scraper):
+
+    dealer = models.ForeignKey(
+        "products.Dealer",
+        verbose_name=_("dealer"))
+
+
+class DealerScraperReport(ScraperReport):
+
+    scraper = models.ForeignKey(
+        "products.DealerScraper",
+        verbose_name=_("scraper"))
 
 
 class ProductListing(Creatable, Modifiable):
