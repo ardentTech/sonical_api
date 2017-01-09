@@ -1,3 +1,6 @@
+from os import sep
+import pdb
+
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -18,6 +21,12 @@ class Scraper(Creatable, Modifiable):
     class Meta:
         abstract = True
         ordering = ["id"]
+
+    def run(self):
+        parts = self.file_path.split(".")[0].split(sep)
+        pdb.set_trace()
+#        mod = __import__(".".join(parts[:-1]), fromlist=[parts[-1:]])
+#        cls = mod.PartsExpressScraper
 
 
 class ScraperReport(Creatable):

@@ -1,5 +1,7 @@
 from django.core.management.base import BaseCommand
 
+from dealers.models import DealerScraper
+
 
 class Command(BaseCommand):
 
@@ -9,4 +11,6 @@ class Command(BaseCommand):
         super(Command, self).__init__(*args, **kwargs)
 
     def handle(self, *args, **kwargs):
-        pass
+        scrapers = DealerScraper.objects.filter(is_active=True)
+        for scraper in scrapers:
+            scraper.run()

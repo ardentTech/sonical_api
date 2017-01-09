@@ -19,8 +19,10 @@ build() {
     if migrate; then
       if test; then
         if createsuperuser; then
-          if runserver; then
-            echo
+          if seed; then
+            if runserver; then
+              echo
+            fi
           fi
         fi
       fi
@@ -57,11 +59,11 @@ runserver() {
   cd ${PROJ} && ${PM} runserver 127.0.0.1:8001 ${SETTINGS}
 }
 
-syncdrivers() {
+seed() {
   echo
-  echo "########### SYNC DRIVERS ###########"
+  echo "########### SEED ###########"
 
-  cd ${PROJ} && ${PM} sync_drivers ${SETTINGS}
+  cd ${PROJ} && ${PM} seed ${SETTINGS}
 }
 
 test() {
