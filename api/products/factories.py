@@ -1,13 +1,7 @@
 import factory
 from factory import fuzzy
 
-
-class DealerFactory(factory.DjangoModelFactory):
-
-    name = factory.Sequence(lambda n: "name-{0}".format(n))
-
-    class Meta:
-        model = "products.Dealer"
+from dealers.factories import DealerFactory
 
 
 class ProductListing(factory.DjangoModelFactory):

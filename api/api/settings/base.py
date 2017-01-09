@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "rest_framework",
     # app
+    "dealers",
     "drivers",
     "manufacturing",
     "products",
