@@ -1,3 +1,5 @@
+import os
+
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -32,6 +34,12 @@ class DealerScraper(Scraper):
     dealer = models.ForeignKey(
         "dealers.Dealer",
         verbose_name=_("dealer"))
+
+    # @todo move this to base Scraper
+    def run(self):
+        package = ".".join([os.path.abspath(__file__).split("/")[-2], "scrapers"])
+        mod = __import__(package, fromlist=[self.class_name])
+        getattr(mod, self.class_name)().run()
 
 
 class DealerScraperReport(ScraperReport):

@@ -1,32 +1,24 @@
-from os import sep
-import pdb
-
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from utils.models import Creatable, Modifiable
-from utils.validators import validate_file_path
 
 
 class Scraper(Creatable, Modifiable):
 
-    file_path = models.CharField(
-        _("file path"),
-        max_length=128,
-        validators=[validate_file_path])
+    class_name = models.CharField(
+        _("class name"),
+        max_length=128)
     is_active = models.BooleanField(
         _("is active"),
         default=True)
 
     class Meta:
         abstract = True
-        ordering = ["id"]
+        ordering = ["class_name"]
 
-    def run(self):
-        parts = self.file_path.split(".")[0].split(sep)
-        pdb.set_trace()
-#        mod = __import__(".".join(parts[:-1]), fromlist=[parts[-1:]])
-#        cls = mod.PartsExpressScraper
+    def __str__(self):
+        return self.class_name
 
 
 class ScraperReport(Creatable):

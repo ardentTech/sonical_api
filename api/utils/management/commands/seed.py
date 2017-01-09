@@ -1,5 +1,3 @@
-import os
-
 from django.core.management.base import BaseCommand
 
 from dealers.factories import DealerFactory, DealerScraperFactory
@@ -18,8 +16,6 @@ class Command(BaseCommand):
 
         dealer_scrapers = []
         for dealer in dealers:
-            file_path = os.path.join(
-                "dealers", "scrapers", dealer.name.lower().replace(" ", "_") + ".py")
             dealer_scrapers.append(DealerScraperFactory.create(
-                dealer=dealer, file_path=file_path))
+                class_name="PartsExpressScraper", dealer=dealer))
         print("Created {0} DealerScraper(s)".format(len(dealer_scrapers)))

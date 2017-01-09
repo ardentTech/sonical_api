@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Dealer
+from .models import Dealer, DealerScraper
 
 
 class DealerAdmin(admin.ModelAdmin):
@@ -29,3 +29,4 @@ class DealerAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Dealer, DealerAdmin)
+admin.site.register(DealerScraper)
