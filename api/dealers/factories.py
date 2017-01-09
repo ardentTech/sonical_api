@@ -7,3 +7,11 @@ class DealerFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = "dealers.Dealer"
+
+
+class DealerScraperFactory(factory.DjangoModelFactory):
+
+    dealer = DealerFactory()
+
+    class Meta:
+        model = "dealers.DealerScraper"
