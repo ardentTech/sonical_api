@@ -1,0 +1,34 @@
+from django.db import models
+from django.utils.translation import ugettext_lazy as _
+
+from utils.models import Creatable, Modifiable
+from utils.validators import validate_file_path
+
+
+class Scraper(Creatable, Modifiable):
+
+    file_path = models.CharField(
+        _("file path"),
+        max_length=128,
+        validators=[validate_file_path])
+    is_active = models.BooleanField(
+        _("is active"),
+        default=True)
+
+    class Meta:
+        abstract = True
+        ordering = ["id"]
+
+
+class ScraperReport(Creatable):
+
+    attempted = models.PositiveIntegerField(
+        _("attempted"),
+        default=0)
+    processed = models.PositiveIntegerField(
+        _("processed"),
+        default=0)
+
+    class Meta:
+        abstract = True
+        ordering = ["id"]
