@@ -6,6 +6,7 @@ from utils.models import Creatable, Modifiable
 
 class Manufacturer(Creatable, Modifiable):
 
+    # @todo is_active?
     name = models.CharField(
         _("Name"),
         db_index=True,

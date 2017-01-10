@@ -6,11 +6,11 @@ from lxml import html
 import requests
 
 from dealers.models import DealerScraperReport
-# from drivers.models import DriverProductListing
+from drivers.models import Driver
+from manufacturing.models import Manufacturer
 from utils.mixins.mode import ModeMixin
 
 
-# @todo save Driver record
 # @todo move all xpath patterns to another file
 # @todo fetch price from list page and NOT detail
 # @todo if there is already a DriverProductListing for a given path, simply
@@ -37,6 +37,7 @@ class DealerScraper(Scraper):
         self.base_url = scraper_record.dealer.website
 #        self.product_listings = self._get_product_listings(dealer)
 #        print("{0}".format(len(self.product_listings)))
+        self.manufacturers = {m.name: m for m in Manufacturer.objects.all()}
         self.report = DealerScraperReport(scraper=scraper_record)
 
 #    def _get_product_listings(self, dealer):
@@ -63,10 +64,14 @@ class PartsExpressScraper(DealerScraper):
         for driver_path in self.result["driver_paths"]:
             self._scrape_driver(driver_path)
 
-        self._result_to_report()
+        self._process_result()
 
     def _get_limit(self):
         return None if self.pro_mode() else 1
+
+    def _process_result(self):
+        Driver.objects.bulk_create(self.result["drivers"])
+        self._result_to_report()
 
     def _result_to_report(self):
         self.report.attempted = len(self.result["driver_paths"])
@@ -74,24 +79,21 @@ class PartsExpressScraper(DealerScraper):
         self.report.save()
 
     def _scrape_category_paths(self, path, limit):
-        targets = {"DRIVER_CATEGORY": '//a[@id="lbCategoryName"]/@href'}
+        patterns = {"DRIVER_CATEGORY": '//a[@id="lbCategoryName"]/@href'}
         categories = self.get_html(
-            self.build_url(path)).xpath(targets["DRIVER_CATEGORY"])
+            self.build_url(path)).xpath(patterns["DRIVER_CATEGORY"])
 
         self.result["category_paths"] = [
             c for c in categories if not re.search(r"replace|recone", c)][:limit]
 
     def _scrape_driver(self, path):
-        targets = [
-            ('//div[@id="MiddleColumn1"]', [
-                # (key, xpath pattern, formatter)
-                ("price", 'div[@class="PriceContBox"]/div[1]/div[1]/span[1]/span[2]/text()', "decimal"),
-            ]),
+        patterns = [
+            ('//div[@id="MiddleColumn1"]', []),
             ('//div[@class="ProducDetailsNote"]', [
                 # (key, table row column one text, formatter)
                 ("dc_resistance", "DC Resistance (Re)", "decimal"),
                 ("electromagnetic_q", "Electromagnetic Q (Qes)", "decimal"),
-                ("manufacturer", "Brand", None),
+                ("manufacturer", "Brand", "manufacturer"),
                 ("max_power", "Power Handling (max)", "int"),
                 ("mechanical_q", "Mechanical Q (Qms)", "decimal"),
                 ("model", "Model", None),
@@ -104,10 +106,10 @@ class PartsExpressScraper(DealerScraper):
             ])
         ]
 
-        data = {"path": path}
+        data = {}
         tree = self.get_html(self.build_url(path))
 
-        for idx, section in enumerate(targets):
+        for idx, section in enumerate(patterns):
             root = tree.xpath(section[0])[0]
             pattern = '{0}'
             if idx == 1:
@@ -122,21 +124,21 @@ class PartsExpressScraper(DealerScraper):
                 except:
                     pass
 
-        self.result["drivers"].append(data)
+        self.result["drivers"].append(Driver(**data))
 
     def _scrape_driver_paths(self, path, limit):
-        targets = {
+        patterns = {
             "DRIVER_DETAIL": '//a[@id="GridViewProdLink"]/@href',
             "NEXT_PAGE": '//a[@id="ctl00_ctl00_MainContent_uxEBCategory_uxEBProductList_uxBottomPagingLinks_aNextNav"]/@href',
         }
         tree = self.get_html(self.build_url(path))
 
-        for driver in tree.xpath(targets["DRIVER_DETAIL"]):
+        for driver in tree.xpath(patterns["DRIVER_DETAIL"]):
             self.result["driver_paths"].append(driver)
 
         if limit is None:
             try:
-                return self._get_drivers(tree.xpath(targets["NEXT_PAGE"])[0])
+                return self._get_drivers(tree.xpath(patterns["NEXT_PAGE"])[0])
             except IndexError:
                 return
             except:
@@ -147,3 +149,10 @@ class PartsExpressScraper(DealerScraper):
 
     def _to_int(self, val):
         return int(val.split(" ")[0])
+
+    def _to_manufacturer(self, val):
+        try:
+            return self.manufacturers[val]
+        except:
+            self.manufacturers[val] = Manufacturer.objects.create(name=val)
+            return self.manufacturers[val]
