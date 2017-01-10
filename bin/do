@@ -66,6 +66,13 @@ seed() {
   cd ${PROJ} && ${PM} seed ${SETTINGS}
 }
 
+sync_dealer_data() {
+  echo
+  echo "########### SYNC DEALER DATA ###########"
+
+  cd ${PROJ} && ${PM} sync_dealer_data ${SETTINGS}
+}
+
 test() {
   echo
   echo "########### TEST ###########"

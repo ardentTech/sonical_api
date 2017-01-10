@@ -38,7 +38,7 @@ class DealerScraper(Scraper):
     def run(self):
         package = ".".join([os.path.abspath(__file__).split("/")[-2], "scrapers"])
         mod = __import__(package, fromlist=[self.class_name])
-        getattr(mod, self.class_name)(self.dealer).run()
+        getattr(mod, self.class_name)(self).run()
 
 
 class DealerScraperReport(ScraperReport):
