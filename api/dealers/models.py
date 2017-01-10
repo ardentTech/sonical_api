@@ -35,11 +35,10 @@ class DealerScraper(Scraper):
         "dealers.Dealer",
         verbose_name=_("dealer"))
 
-    # @todo move this to base Scraper
     def run(self):
         package = ".".join([os.path.abspath(__file__).split("/")[-2], "scrapers"])
         mod = __import__(package, fromlist=[self.class_name])
-        getattr(mod, self.class_name)().run()
+        getattr(mod, self.class_name)(self.dealer).run()
 
 
 class DealerScraperReport(ScraperReport):
