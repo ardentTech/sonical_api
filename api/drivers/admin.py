@@ -108,7 +108,8 @@ class DriverProductListingAdmin(admin.ModelAdmin):
             "fields": ("created", "id", "modified",)
         })
     )
-    list_display = ("id", "_price", "path", "created", "modified",)
+    list_display = ("id", "driver", "dealer", "_price", "created", "modified",)
+    list_filter = ("dealer",)
     readonly_fields = ("created", "id", "modified",)
 
     def _price(self, obj):
