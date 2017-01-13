@@ -11,9 +11,7 @@ from manufacturing.models import Manufacturer
 from utils.mixins.mode import ModeMixin
 
 
-# @todo fetch price from list page and NOT detail
-# @todo if there is already a DriverProductListing for a given path, simply
-# @todo update the price and DO NOT scrape the detail.
+# @todo get driver.model from price section at top
 # @todo try/except in each _scrape method
 # @todo detect if no records are in database, and enter in a different
 # insert-only type mode
@@ -45,46 +43,61 @@ class DealerScraper(Scraper):
 
 class RecordProcessor(object):
 
+    RECORD_TYPES = ["drivers", "listings"]
+
     def __init__(self, dealer):
         self.dealer = dealer
-        self.processed = {
-            "drivers": {"create": []},
-            "listings": {"create": [], "update": []}}
-        self.unprocessed = {
-            "drivers": {
-                "create": []  # Driver
-            },
-            "listings": {
-                "create": [],  # {},
-                "update": []  # DriverProductListing
-            }}
+        self.records = self._configure_records()
 
     def add_driver(self, payload):
-        self.unprocessed["drivers"]["create"].append(payload)
+        self.records["drivers"]["unprocessed"]["create"].append(payload)
 
     def add_listing(self, payload, update=False):
-        listings = self.unprocessed["listings"]
         if update:
-            listings["update"].append(payload)
+            self.records["listings"]["unprocessed"]["update"].append(payload)
         else:
-            listings["create"].append(payload)
+            self.records["listings"]["unprocessed"]["create"].append(payload)
+
+    def get_result(self):
+        return self.result
 
     def process(self):
         self._process_drivers()
         self._process_listings()
+        return self._generate_result()
+
+    def _configure_records(self):
+        _records = {}
+        for _type in self.RECORD_TYPES:
+            _records[_type] = {
+                "processed": {"create": [], "update": []},
+                "unprocessed": {"create": [], "update": []}
+            }
+        return _records
+
+    def _generate_result(self):
+        return {
+            "drivers_created": len(self.records["drivers"]["processed"]["create"]),
+            "listings_created": len(self.records["listings"]["processed"]["create"]),
+            "listings_updated": len(self.records["listings"]["processed"]["update"])
+        }
 
     def _process_listings(self):
         listings = []
-        for idx, item in enumerate(self.unprocessed["listings"]["create"]):
+        for idx, item in enumerate(self.records["listings"]["unprocessed"]["create"]):
             item["dealer"] = self.dealer
-            item["driver"] = self.processed["drivers"]["create"][idx]
+            item["driver"] = self.records["drivers"]["processed"]["create"][idx]
             item["price"] = Decimal(item["price"].__str__().lstrip("$"))
             listings.append(DriverProductListing(**item))
-        self.processed["listings"]["create"] = DriverProductListing.objects.bulk_create(listings)
+        self.records["listings"]["processed"]["create"] = DriverProductListing.objects.bulk_create(listings)
+
+# @todo
+#        self.records["listings"]["processed"]["update"] = DriverProductListing.objects.bulk_update(
+#            self.records["listings"]["processed"]["update"])
 
     def _process_drivers(self):
-        self.processed["drivers"]["create"] = Driver.objects.bulk_create(
-            self.unprocessed["drivers"]["create"])
+        self.records["drivers"]["processed"]["create"] = Driver.objects.bulk_create(
+            self.records["drivers"]["unprocessed"]["create"])
 
 
 class PartsExpressScraper(DealerScraper):
@@ -112,10 +125,14 @@ class PartsExpressScraper(DealerScraper):
                         Driver(**self._scrape_driver(listing["path"])))
                     self.record_processor.add_listing(listing)
 
-        self.record_processor.process()
+        result = self.record_processor.process()
+        self._result_to_report(result)
 
     def _get_limit(self):
         return None if self.pro_mode() else 1
+
+    def _result_to_report(self, result):
+        pass
 
     def _scrape_category_paths(self, path, limit):
         patterns = {"DRIVER_CATEGORY": '//a[@id="lbCategoryName"]/@href'}
