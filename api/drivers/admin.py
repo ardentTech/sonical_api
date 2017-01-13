@@ -108,12 +108,20 @@ class DriverProductListingAdmin(admin.ModelAdmin):
             "fields": ("created", "id", "modified",)
         })
     )
-    list_display = ("id", "driver", "dealer", "_price", "created", "modified",)
+    list_display = (
+        "id", "driver", "_manufacturer", "dealer", "_price", "created", "modified",)
     list_filter = ("dealer",)
     readonly_fields = ("created", "id", "modified",)
 
+    def _manufacturer(self, obj):
+        return obj.driver.manufacturer.name
+    _manufacturer.short_description = "Manufacturer"
+#    _manufacturer.admin_order_field = "name"
+
     def _price(self, obj):
         return "$" + str(intcomma(obj.price))
+    _price.short_description = "Price"
+    _price.admin_order_field = "price"
 
 
 admin.site.register(Driver, DriverAdmin)

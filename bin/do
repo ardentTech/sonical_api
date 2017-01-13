@@ -20,9 +20,7 @@ build() {
       if test; then
         if createsuperuser; then
           if seed; then
-            if runserver; then
-              echo
-            fi
+            echo
           fi
         fi
       fi

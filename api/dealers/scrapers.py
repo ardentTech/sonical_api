@@ -43,54 +43,79 @@ class DealerScraper(Scraper):
         self.report = DealerScraperReport(scraper=scraper_record)
 
 
+class RecordProcessor(object):
+
+    def __init__(self, dealer):
+        self.dealer = dealer
+        self.processed = {
+            "drivers": {"create": []},
+            "listings": {"create": [], "update": []}}
+        self.unprocessed = {
+            "drivers": {
+                "create": []  # Driver
+            },
+            "listings": {
+                "create": [],  # {},
+                "update": []  # DriverProductListing
+            }}
+
+    def add_driver(self, payload):
+        self.unprocessed["drivers"]["create"].append(payload)
+
+    def add_listing(self, payload, update=False):
+        listings = self.unprocessed["listings"]
+        if update:
+            listings["update"].append(payload)
+        else:
+            listings["create"].append(payload)
+
+    def process(self):
+        self._process_drivers()
+        self._process_listings()
+
+    def _process_listings(self):
+        listings = []
+        for idx, item in enumerate(self.unprocessed["listings"]["create"]):
+            item["dealer"] = self.dealer
+            item["driver"] = self.processed["drivers"]["create"][idx]
+            item["price"] = Decimal(item["price"].__str__().lstrip("$"))
+            listings.append(DriverProductListing(**item))
+        self.processed["listings"]["create"] = DriverProductListing.objects.bulk_create(listings)
+
+    def _process_drivers(self):
+        self.processed["drivers"]["create"] = Driver.objects.bulk_create(
+            self.unprocessed["drivers"]["create"])
+
+
 class PartsExpressScraper(DealerScraper):
 
     SEED = "/cat/hi-fi-woofers-subwoofers-midranges-tweeters/13"
 
     def __init__(self, scraper_record):
         super(PartsExpressScraper, self).__init__(scraper_record)
-        self.result = {
-            "drivers": {"create": [], "update": []},
-            "listings": {"create": [], "update": []}}
+        self.record_processor = RecordProcessor(self.dealer)
 
     def run(self):
         limit = self._get_limit()
 
         for category_path in self._scrape_category_paths(self.SEED, limit):
-            listings, next_path = self._scrape_driver_listings(category_path, limit)
+            # @todo handle next_path
+            listings, next_path = self._scrape_listings(category_path, limit)
             for listing in listings:
-                dpl = self.driver_product_listings.get(listing["path"], None)
-                if dpl is not None:
-                    dpl.price = listing["price"]
-                    self.result["listings"]["update"].append(dpl)
+                existing_listing = self.driver_product_listings.get(
+                    listing["path"], None)
+                if existing_listing is not None:
+                    existing_listing.price = listing["price"]
+                    self.record_processor.add_listing(existing_listing, True)
                 else:
-                    self.result["drivers"]["create"].append(
+                    self.record_processor.add_driver(
                         Driver(**self._scrape_driver(listing["path"])))
-                    self.result["listings"]["create"].append(listing)
+                    self.record_processor.add_listing(listing)
 
-        self._process_result()
+        self.record_processor.process()
 
     def _get_limit(self):
         return None if self.pro_mode() else 1
-
-    def _process_result(self):
-        # @todo deal with updates
-        new_drivers = Driver.objects.bulk_create(self.result["drivers"]["create"])
-        listings = []
-        for idx, attr in enumerate(self.result["listings"]["create"]):
-            attr["dealer"] = self.dealer
-            attr["driver"] = new_drivers[idx]
-            attr["price"] = Decimal(attr["price"].__str__().lstrip("$"))
-            listings.append(DriverProductListing(**attr))
-        new_listings = DriverProductListing.objects.bulk_create(listings)
-        print("NEW DRIVERS: {0}".format(len(new_drivers)))
-        print("NEW DRIVER PRODUCT LISTINGS: {0}".format(len(new_listings)))
-#        self._result_to_report()
-#
-#    def _result_to_report(self):
-#        self.report.attempted = len(self.result["driver_listings"])
-#        self.report.processed = len(self.result["drivers"])
-#        self.report.save()
 
     def _scrape_category_paths(self, path, limit):
         patterns = {"DRIVER_CATEGORY": '//a[@id="lbCategoryName"]/@href'}
@@ -140,7 +165,7 @@ class PartsExpressScraper(DealerScraper):
 
         return data
 
-    def _scrape_driver_listings(self, path, limit):
+    def _scrape_listings(self, path, limit):
         patterns = {
             "next_page": '//a[@id="ctl00_ctl00_MainContent_uxEBCategory_uxEBProductList_uxBottomPagingLinks_aNextNav"]',
             "listing": {
