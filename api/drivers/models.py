@@ -118,6 +118,7 @@ class DriverGroup(Creatable, Modifiable):
 
     class Meta:
         ordering = ["id"]
+        verbose_name_plural = "Driver Groups"
 
     def __str__(self):
         return "{0} {1}".format(self.id, self.name)
@@ -132,6 +133,7 @@ class DriverProductListing(ProductListing):
 
     class Meta:
         ordering = ["id"]
+        verbose_name_plural = "Driver Product Listings"
 
     def __str__(self):
         return "{0} {1}".format(self.dealer.name, self.driver.model)

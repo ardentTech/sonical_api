@@ -76,11 +76,12 @@ class RecordProcessor(object):
         return _records
 
     def _generate_result(self):
-        return {
-            "drivers_created": len(self.records["drivers"]["processed"]["create"]),
-            "listings_created": len(self.records["listings"]["processed"]["create"]),
-            "listings_updated": len(self.records["listings"]["processed"]["update"])
-        }
+        result = {}
+        for _type in self.records:
+            result[_type] = {}
+            for state in self.records[_type]:
+                result[_type][state] = sum([len(v) for v in self.records[_type][state].values()])
+        return result
 
     def _process_listings(self):
         listings = []
@@ -126,13 +127,16 @@ class PartsExpressScraper(DealerScraper):
                     self.record_processor.add_listing(listing)
 
         result = self.record_processor.process()
-        self._result_to_report(result)
+        self._create_report(result)
 
     def _get_limit(self):
         return None if self.pro_mode() else 1
 
-    def _result_to_report(self, result):
-        pass
+    def _create_report(self, result):
+        for k, v in result.items():
+            self.report.attempted += v["unprocessed"]
+            self.report.processed += v["processed"]
+        self.report.save()
 
     def _scrape_category_paths(self, path, limit):
         patterns = {"DRIVER_CATEGORY": '//a[@id="lbCategoryName"]/@href'}

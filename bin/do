@@ -50,7 +50,7 @@ migrate() {
   cd ${PROJ} && ${PM} migrate ${SETTINGS}
 }
 
-runserver() {
+run_server() {
   echo
   echo "########### RUN SERVER ###########"
 

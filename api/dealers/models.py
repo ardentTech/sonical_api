@@ -35,6 +35,9 @@ class DealerScraper(Scraper):
         "dealers.Dealer",
         verbose_name=_("dealer"))
 
+    class Meta:
+        verbose_name_plural = "Dealer Scrapers"
+
     def run(self):
         package = ".".join([os.path.abspath(__file__).split("/")[-2], "scrapers"])
         mod = __import__(package, fromlist=[self.class_name])
@@ -46,3 +49,6 @@ class DealerScraperReport(ScraperReport):
     scraper = models.ForeignKey(
         "dealers.DealerScraper",
         verbose_name=_("scraper"))
+
+    class Meta:
+        verbose_name_plural = "Dealer Scraper Reports"
