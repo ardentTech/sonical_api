@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     "manufacturing",
     "products",
     "scrapers",
+    "users",
     "utils",
 ]
 
@@ -157,3 +158,7 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 25,
     "TEST_REQUEST_DEFAULT_FORMAT": "JSON",
 }
+
+AUTH_USER_MODEL = "users.User"
+
+SONICAL_DEFAULT_PASSWORD = get_env_var("SONICAL_DEFAULT_PASSWORD")

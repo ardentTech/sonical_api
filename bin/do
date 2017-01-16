@@ -18,22 +18,13 @@ build() {
   if makemigrations; then
     if migrate; then
       if test; then
-        if createsuperuser; then
-          if seed; then
-            echo
-          fi
+        if seed; then
+          echo
         fi
       fi
     fi
   fi
 
-}
-
-createsuperuser() {
-  echo
-  echo "########### CREATE SUPERUSER ###########"
-
-  cd ${PROJ} && ${PM} createsuperuser ${SETTINGS}
 }
 
 makemigrations() {
