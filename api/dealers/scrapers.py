@@ -45,66 +45,97 @@ class DealerScraper(Scraper):
 
 class RecordProcessor(object):
 
-    RECORD_TYPES = ["drivers", "listings"]
+    CREATE = "create"
+    DRIVERS = "drivers"
+    LISTINGS = "listings"
+    UPDATE = "update"
+    RECORD_METHODS = [CREATE, UPDATE]
+    RECORD_TYPES = [DRIVERS, LISTINGS]
 
     def __init__(self, dealer):
         self.dealer = dealer
-        self.records = self._configure_records()
-
-    def add_driver(self, payload):
-        self.records["drivers"]["unprocessed"]["create"].append(payload)
-
-    def add_listing(self, payload, update=False):
-        if update:
-            self.records["listings"]["unprocessed"]["update"].append(payload)
-        else:
-            self.records["listings"]["unprocessed"]["create"].append(payload)
-
-    def get_result(self):
-        return self.result
+        self.errors = []
+        # @todo should container be a nested class?
+        self.processed = self._get_container()
+        self.unprocessed = self._get_container()
 
     def process(self):
         self._process_drivers()
         self._process_listings()
-        return self._generate_result()
-
-    def _configure_records(self):
-        _records = {}
-        for _type in self.RECORD_TYPES:
-            _records[_type] = {
-                "processed": {"create": [], "update": []},
-                "unprocessed": {"create": [], "update": []}
-            }
-        return _records
-
-    def _generate_result(self):
-        # @todo want this: self.drivers_created()
-        # @todo errors
         return {
-            "drivers_created": len(self.records["drivers"]["processed"]["create"]),
-            "driver_product_listings_created": len(self.records["listings"]["processed"]["create"]),
-            "driver_product_listings_updated": len(self.records["listings"]["processed"]["update"]),
-            "errors": 0}
+            "drivers_created": len(self._drivers_created()),
+            "driver_product_listings_created": len(self._listings_created()),
+            "driver_product_listings_updated": len(self._listings_updated()),
+            "errors": len(self.errors)}
 
-    def _process_listings(self):
-        listings = []
-        for idx, item in enumerate(self.records["listings"]["unprocessed"]["create"]):
-            item["dealer"] = self.dealer
-            item["driver"] = self.records["drivers"]["processed"]["create"][idx]
-            item["price"] = Decimal(item["price"].__str__().lstrip("$"))
-            listings.append(DriverProductListing(**item))
+    def queue_driver(self, record):
+        self._queue_record(self.DRIVERS, record, False)
 
-        if listings:
-            self.records["listings"]["processed"]["create"] = DriverProductListing.objects.bulk_create(listings)
+    def queue_listing(self, record, update=False):
+        self._queue_record(self.LISTINGS, record, update)
 
-        if self.records["listings"]["processed"]["update"]:
-            self.records["listings"]["processed"]["update"] = bulk_update(
-                self.records["listings"]["processed"]["update"],
-                update_fields=["price"])
+    def _get_container(self):
+        container = {}
+        for _type in self.RECORD_TYPES:
+            container[_type] = {method: [] for method in self.RECORD_METHODS}
+        return container
+
+    # @todo should these be getters/setters?
+    def _drivers_created(self):
+        return self.processed[self.DRIVERS][self.CREATE]
+
+    def _drivers_to_create(self):
+        return self.unprocessed[self.DRIVERS][self.CREATE]
+
+    def _listings_created(self):
+        return self.processed[self.LISTINGS][self.CREATE]
+
+    def _listings_updated(self):
+        return self.processed[self.LISTINGS][self.UPDATE]
+
+    def _listings_to_create(self):
+        return self.unprocessed[self.LISTINGS][self.CREATE]
+
+    def _listings_to_update(self):
+        return self.unprocessed[self.LISTINGS][self.UPDATE]
 
     def _process_drivers(self):
-        self.records["drivers"]["processed"]["create"] = Driver.objects.bulk_create(
-            self.records["drivers"]["unprocessed"]["create"])
+        try:
+            self.processed[self.DRIVERS][self.CREATE] = Driver.objects.bulk_create(
+                self._drivers_to_create())
+        except Exception as e:
+            self.errors.append("_process_drivers(): " + repr(e))
+
+    def _process_listings(self):
+        self._process_listings_create()
+        self._process_listings_update()
+
+    def _process_listings_create(self):
+        try:
+            _listings = []
+            for idx, item in enumerate(self._listings_to_create()):
+                item["dealer"] = self.dealer
+                item["driver"] = self._drivers_created()[idx]
+                item["price"] = Decimal(item["price"].__str__().lstrip("$"))
+                _listings.append(DriverProductListing(**item))
+
+            if _listings:
+                self.processed[self.LISTINGS][self.CREATE] = DriverProductListing.objects.bulk_create(
+                    _listings)
+        except Exception as e:
+            self.errors.append("_process_listings_create(): " + repr(e))
+
+    def _process_listings_update(self):
+        try:
+            if self._listings_to_update():
+                self.processed[self.LISTINGS][self.UPDATE] = bulk_update(
+                    self._listings_to_update, update_fields=["price"])
+        except Exception as e:
+            self.errors.append("_process_listings_update(): " + repr(e))
+
+    def _queue_record(self, _type, record, update):
+        method = self.UPDATE if update else self.CREATE
+        self.unprocessed[_type][method].append(record)
 
 
 class PartsExpressScraper(DealerScraper):
@@ -126,14 +157,13 @@ class PartsExpressScraper(DealerScraper):
                     listing["path"], None)
                 if existing_listing is not None:
                     existing_listing.price = listing["price"]
-                    self.record_processor.add_listing(existing_listing, True)
+                    self.record_processor.queue_listing(existing_listing, True)
                 else:
-                    self.record_processor.add_driver(
+                    self.record_processor.queue_driver(
                         Driver(**self._scrape_driver(listing["path"])))
-                    self.record_processor.add_listing(listing)
+                    self.record_processor.queue_listing(listing)
 
-        result = self.record_processor.process()
-        self._create_report(result)
+        self._create_report(self.record_processor.process())
 
     def _get_limit(self):
         return None if self.pro_mode() else 1
