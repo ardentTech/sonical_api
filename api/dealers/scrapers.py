@@ -2,6 +2,7 @@ from decimal import Decimal
 import re
 from time import sleep
 
+from bulk_update.helper import bulk_update
 from lxml import html
 import requests
 
@@ -11,6 +12,7 @@ from manufacturing.models import Manufacturer
 from utils.mixins.mode import ModeMixin
 
 
+# @todo update records
 # @todo get driver.model from price section at top
 # @todo try/except in each _scrape method
 # @todo detect if no records are in database, and enter in a different
@@ -90,11 +92,14 @@ class RecordProcessor(object):
             item["driver"] = self.records["drivers"]["processed"]["create"][idx]
             item["price"] = Decimal(item["price"].__str__().lstrip("$"))
             listings.append(DriverProductListing(**item))
-        self.records["listings"]["processed"]["create"] = DriverProductListing.objects.bulk_create(listings)
 
-# @todo
-#        self.records["listings"]["processed"]["update"] = DriverProductListing.objects.bulk_update(
-#            self.records["listings"]["processed"]["update"])
+        if listings:
+            self.records["listings"]["processed"]["create"] = DriverProductListing.objects.bulk_create(listings)
+
+        if self.records["listings"]["processed"]["update"]:
+            self.records["listings"]["processed"]["update"] = bulk_update(
+                self.records["listings"]["processed"]["update"],
+                update_fields=["price"])
 
     def _process_drivers(self):
         self.records["drivers"]["processed"]["create"] = Driver.objects.bulk_create(
@@ -137,6 +142,7 @@ class PartsExpressScraper(DealerScraper):
             self.report.attempted += v["unprocessed"]
             self.report.processed += v["processed"]
         self.report.save()
+        print("{0}".format(self.report.__dict__))
 
     def _scrape_category_paths(self, path, limit):
         patterns = {"DRIVER_CATEGORY": '//a[@id="lbCategoryName"]/@href'}
