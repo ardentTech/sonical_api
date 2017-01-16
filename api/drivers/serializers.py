@@ -25,8 +25,10 @@ class DriverSerializer(serializers.ModelSerializer):
 
     class Meta:
         fields = (
+            "bl_product",
             "created",
             "dc_resistance",
+            "diaphragm_mass_including_airload",
             "electromagnetic_q",
             "id",
             "in_production",

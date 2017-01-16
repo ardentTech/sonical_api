@@ -178,7 +178,9 @@ class PartsExpressScraper(DealerScraper):
             ]),
             ('//div[@class="ProducDetailsNote"]', [
                 # (key, table row column one text, formatter)
+                ("bl_product", "BL Product (BL)", "decimal"),
                 ("dc_resistance", "DC Resistance (Re)", "decimal"),
+                ("diaphragm_mass_including_airload", "Diaphragm Mass Inc. Airload (Mms)", "diaphragm"),
                 ("electromagnetic_q", "Electromagnetic Q (Qes)", "decimal"),
                 ("frequency_response", "Frequency Response", "frequency_response"),
                 ("manufacturer", "Brand", "manufacturer"),
@@ -258,11 +260,14 @@ class PartsExpressScraper(DealerScraper):
             _val = whole_number + "." + decimal_digits
         return Decimal(_val)
 
+    def _to_diaphragm(self, val):
+        return Decimal(val.rstrip("g"))
+
     def _to_int(self, val):
         return int(val.split(" ")[0])
 
     def _to_frequency_response(self, val):
-        parts = val.strip(",").split(" ")
+        parts = val.replace(",", "").split(" ")
         return (Decimal(parts[0]), Decimal(parts[2]))
 
     def _to_manufacturer(self, val):

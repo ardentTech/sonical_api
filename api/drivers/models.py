@@ -8,8 +8,20 @@ from utils.models import Creatable, Modifiable
 
 class Driver(Creatable, Modifiable):
 
+    bl_product = models.DecimalField(
+        _("BL Product (Tm)"),
+        blank=True,
+        decimal_places=2,
+        max_digits=5,
+        null=True)
     dc_resistance = models.DecimalField(
         _("DC Resistance (ohms)"),
+        blank=True,
+        decimal_places=2,
+        max_digits=5,
+        null=True)
+    diaphragm_mass_including_airload = models.DecimalField(
+        _("Diaphragm Mass Inc. Airload (g)"),
         blank=True,
         decimal_places=2,
         max_digits=5,
@@ -84,8 +96,6 @@ class Driver(Creatable, Modifiable):
         max_digits=5,
         null=True)
 
-# @todo need concept of version? manufacturer *could* keep the same model
-# name...
 #    hifi_or_pa (application?)
 #    compliance_equivalent_volume float (ft**3)
 #    mechanical_compliance_of_suspension float (mm/N)
