@@ -1,3 +1,4 @@
+from django.contrib.postgres.fields import IntegerRangeField
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -18,6 +19,10 @@ class Driver(Creatable, Modifiable):
         blank=True,
         decimal_places=2,
         max_digits=5,
+        null=True)
+    frequency_response = IntegerRangeField(
+        _("Frequency Response (Hz)"),
+        blank=True,
         null=True)
     in_production = models.BooleanField(
         _("In Production"),
@@ -66,6 +71,12 @@ class Driver(Creatable, Modifiable):
         help_text="2.83V/1m",
         max_digits=5,
         null=True)
+    voice_coil_diameter = models.DecimalField(
+        _("Voice Coil Diameter (Inches)"),
+        blank=True,
+        decimal_places=2,
+        max_digits=5,
+        null=True)
     voice_coil_inductance = models.DecimalField(
         _("Voice Coil Inductance (MilliHenries)"),
         blank=True,
@@ -76,8 +87,6 @@ class Driver(Creatable, Modifiable):
 # @todo need concept of version? manufacturer *could* keep the same model
 # name...
 #    hifi_or_pa (application?)
-#    frequency_response int -> int (Hz)
-#    total_q float
 #    compliance_equivalent_volume float (ft**3)
 #    mechanical_compliance_of_suspension float (mm/N)
 #    bl_product float (Tm)
@@ -105,9 +114,10 @@ class Driver(Creatable, Modifiable):
     def __str__(self):
         return "{0} {1}".format(self.manufacturer.name, self.model)
 
-#    def validate_unique(self, exclude=None):
-        # @todo validate model + manufacturer.name? part number?
-#        pass
+    def total_q(self):
+        return (
+            (self.electromagnetic_q * self.mechanical_q) /
+            (self.electromagnetic_q + self.mechanical_q))
 
 
 class DriverGroup(Creatable, Modifiable):

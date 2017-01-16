@@ -4,25 +4,34 @@ from django.contrib.humanize.templatetags.humanize import intcomma
 from .models import Driver, DriverGroup, DriverProductListing
 
 
+class DriverProductListingInline(admin.TabularInline):
+    model = DriverProductListing
+
+
 class DriverAdmin(admin.ModelAdmin):
+    inlines = [DriverProductListingInline]
     fieldsets = (
         ("Specs", {
             "fields": (
-                "dc_resistance",
-                "electromagnetic_q",
+                "frequency_response",
                 "manufacturer",
-                "mechanical_q",
                 "model",
                 "nominal_diameter",
                 "rms_power",
                 "max_power",
                 "nominal_impedance",
                 "sensitivity",
+                "voice_coil_diameter",
                 "voice_coil_inductance",
             )
         }),
         ("Thiele-Small", {
-            "fields": ("resonant_frequency",)
+            "fields": (
+                "dc_resistance",
+                "electromagnetic_q",
+                "mechanical_q",
+                "resonant_frequency",
+            )
         }),
         ("Other", {
             "fields": ("in_production",)

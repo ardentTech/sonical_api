@@ -30,6 +30,7 @@ class DriverSerializer(serializers.ModelSerializer):
             "electromagnetic_q",
             "id",
             "in_production",
+            "frequency_response",
             "manufacturer",
             "max_power",
             "mechanical_q",
@@ -41,6 +42,7 @@ class DriverSerializer(serializers.ModelSerializer):
             "resonant_frequency",
             "rms_power",
             "sensitivity",
+            "voice_coil_diameter",
             "voice_coil_inductance",
         )
         model = Driver

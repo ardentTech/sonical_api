@@ -180,14 +180,16 @@ class PartsExpressScraper(DealerScraper):
                 # (key, table row column one text, formatter)
                 ("dc_resistance", "DC Resistance (Re)", "decimal"),
                 ("electromagnetic_q", "Electromagnetic Q (Qes)", "decimal"),
+                ("frequency_response", "Frequency Response", "frequency_response"),
                 ("manufacturer", "Brand", "manufacturer"),
                 ("max_power", "Power Handling (max)", "int"),
                 ("mechanical_q", "Mechanical Q (Qms)", "decimal"),
-                ("nominal_diameter", "Nominal Diameter", "decimal"),
+                ("nominal_diameter", "Nominal Diameter", "diameter"),
                 ("nominal_impedance", "Impedance", "decimal"),
                 ("resonant_frequency", "Resonant Frequency (Fs)", "decimal"),
                 ("rms_power", "Power Handling (RMS)", "int"),
                 ("sensitivity", "Sensitivity", "decimal"),
+                ("voice_coil_diameter", "Voice Coil Diameter", "diameter"),
                 ("voice_coil_inductance", "Voice Coil Inductance (Le)", "decimal"),
             ])
         ]
@@ -246,8 +248,22 @@ class PartsExpressScraper(DealerScraper):
     def _to_decimal(self, val):
         return Decimal(val.split(" ")[0])
 
+    def _to_diameter(self, val):
+        _val = val.rstrip("\"")
+        if "-" in _val:
+            parts = _val.split("-")
+            whole_number = parts[0]
+            fraction = parts[1].split("/")
+            decimal_digits = fraction[0] / fraction[1]
+            _val = whole_number + "." + decimal_digits
+        return Decimal(_val)
+
     def _to_int(self, val):
         return int(val.split(" ")[0])
+
+    def _to_frequency_response(self, val):
+        parts = val.strip(",").split(" ")
+        return (Decimal(parts[0]), Decimal(parts[2]))
 
     def _to_manufacturer(self, val):
         try:
