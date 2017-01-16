@@ -12,13 +12,6 @@ from manufacturing.models import Manufacturer
 from utils.mixins.mode import ModeMixin
 
 
-# @todo update records
-# @todo get driver.model from price section at top
-# @todo try/except in each _scrape method
-# @todo detect if no records are in database, and enter in a different
-# insert-only type mode
-
-
 class Scraper(ModeMixin):
 
     SCRAPER_ID = "Sonical Scraper 1.0 (jonathan@ardent.tech)"
@@ -45,6 +38,7 @@ class DealerScraper(Scraper):
 
 class RecordProcessor(object):
 
+    # @todo should the app have a big file of these constants?
     CREATE = "create"
     DRIVERS = "drivers"
     LISTINGS = "listings"
@@ -55,7 +49,7 @@ class RecordProcessor(object):
     def __init__(self, dealer):
         self.dealer = dealer
         self.errors = []
-        # @todo should container be a nested class?
+        # @todo should container be a nested class that inherits from dict?
         self.processed = self._get_container()
         self.unprocessed = self._get_container()
 
@@ -138,40 +132,36 @@ class RecordProcessor(object):
         self.unprocessed[_type][method].append(record)
 
 
+# @todo try/except in each _scrape method
 class PartsExpressScraper(DealerScraper):
 
     SEED = "/cat/hi-fi-woofers-subwoofers-midranges-tweeters/13"
 
     def __init__(self, scraper_record):
         super(PartsExpressScraper, self).__init__(scraper_record)
+        self.limit = None if self.pro_mode() else 1
         self.record_processor = RecordProcessor(self.dealer)
 
     def run(self):
-        limit = self._get_limit()
-
-        for category_path in self._scrape_category_paths(self.SEED, limit):
+        for category_path in self._scrape_category_paths(self.SEED, self.limit):
             # @todo handle next_path
-            listings, next_path = self._scrape_listings(category_path, limit)
+            listings, next_path = self._scrape_listings(category_path, self.limit)
             for listing in listings:
                 existing_listing = self.driver_product_listings.get(
                     listing["path"], None)
-                if existing_listing is not None:
+                if existing_listing is not None:  # update listing
                     existing_listing.price = listing["price"]
                     self.record_processor.queue_listing(existing_listing, True)
-                else:
+                else:  # create driver and listing
                     self.record_processor.queue_driver(
                         Driver(**self._scrape_driver(listing["path"])))
                     self.record_processor.queue_listing(listing)
 
         self._create_report(self.record_processor.process())
 
-    def _get_limit(self):
-        return None if self.pro_mode() else 1
-
     def _create_report(self, result):
         result["scraper"] = self.db_record
-        report = DealerScraperReport.objects.create(**result)
-        print("{0}".format(report.__dict__))
+        DealerScraperReport.objects.create(**result)
 
     def _scrape_category_paths(self, path, limit):
         patterns = {"DRIVER_CATEGORY": '//a[@id="lbCategoryName"]/@href'}
@@ -183,7 +173,9 @@ class PartsExpressScraper(DealerScraper):
     def _scrape_driver(self, path):
         patterns = [
             # @todo make this structure more readable (@see listings below)
-            ('//div[@id="MiddleColumn1"]', []),
+            ('//div[@id="MiddleColumn1"]', [
+                ("model", 'h1[@class="ProductTitle"]/span/text()', "")
+            ]),
             ('//div[@class="ProducDetailsNote"]', [
                 # (key, table row column one text, formatter)
                 ("dc_resistance", "DC Resistance (Re)", "decimal"),
@@ -191,7 +183,6 @@ class PartsExpressScraper(DealerScraper):
                 ("manufacturer", "Brand", "manufacturer"),
                 ("max_power", "Power Handling (max)", "int"),
                 ("mechanical_q", "Mechanical Q (Qms)", "decimal"),
-                ("model", "Model", None),
                 ("nominal_diameter", "Nominal Diameter", "decimal"),
                 ("nominal_impedance", "Impedance", "decimal"),
                 ("resonant_frequency", "Resonant Frequency (Fs)", "decimal"),
@@ -218,6 +209,9 @@ class PartsExpressScraper(DealerScraper):
                     data[items[0]] = val
                 except:
                     pass
+
+        # @todo need a cleaner way to do this type of thing
+        data["model"] = data["model"].lstrip("{0}".format(data["manufacturer"].name))
 
         return data
 
