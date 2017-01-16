@@ -23,6 +23,8 @@ class Scraper(Creatable, Modifiable):
 
 class ScraperReport(Creatable):
 
+    # @todo execution_time in milliseconds
+
     class Meta:
         abstract = True
         ordering = ["id"]
