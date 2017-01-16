@@ -23,13 +23,6 @@ class Scraper(Creatable, Modifiable):
 
 class ScraperReport(Creatable):
 
-    attempted = models.PositiveIntegerField(
-        _("attempted"),
-        default=0)
-    processed = models.PositiveIntegerField(
-        _("processed"),
-        default=0)
-
     class Meta:
         abstract = True
         ordering = ["id"]

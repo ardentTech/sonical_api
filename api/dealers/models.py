@@ -46,6 +46,18 @@ class DealerScraper(Scraper):
 
 class DealerScraperReport(ScraperReport):
 
+    drivers_created = models.PositiveIntegerField(
+        _("drivers created"),
+        default=0)
+    driver_product_listings_created = models.PositiveIntegerField(
+        _("driver product listings created"),
+        default=0)
+    driver_product_listings_updated = models.PositiveIntegerField(
+        _("driver product listings updated"),
+        default=0)
+    errors = models.PositiveIntegerField(
+        _("errors"),
+        default=0)
     scraper = models.ForeignKey(
         "dealers.DealerScraper",
         verbose_name=_("scraper"))

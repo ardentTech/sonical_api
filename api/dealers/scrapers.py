@@ -40,7 +40,7 @@ class DealerScraper(Scraper):
         self.manufacturers = {m.name: m for m in Manufacturer.objects.all()}
         self.driver_product_listings = {
             l.path: l for l in DriverProductListing.objects.filter(dealer=self.dealer)}
-        self.report = DealerScraperReport(scraper=scraper_record)
+        self.db_record = scraper_record
 
 
 class RecordProcessor(object):
@@ -78,12 +78,13 @@ class RecordProcessor(object):
         return _records
 
     def _generate_result(self):
-        result = {}
-        for _type in self.records:
-            result[_type] = {}
-            for state in self.records[_type]:
-                result[_type][state] = sum([len(v) for v in self.records[_type][state].values()])
-        return result
+        # @todo want this: self.drivers_created()
+        # @todo errors
+        return {
+            "drivers_created": len(self.records["drivers"]["processed"]["create"]),
+            "driver_product_listings_created": len(self.records["listings"]["processed"]["create"]),
+            "driver_product_listings_updated": len(self.records["listings"]["processed"]["update"]),
+            "errors": 0}
 
     def _process_listings(self):
         listings = []
@@ -138,11 +139,9 @@ class PartsExpressScraper(DealerScraper):
         return None if self.pro_mode() else 1
 
     def _create_report(self, result):
-        for k, v in result.items():
-            self.report.attempted += v["unprocessed"]
-            self.report.processed += v["processed"]
-        self.report.save()
-        print("{0}".format(self.report.__dict__))
+        result["scraper"] = self.db_record
+        report = DealerScraperReport.objects.create(**result)
+        print("{0}".format(report.__dict__))
 
     def _scrape_category_paths(self, path, limit):
         patterns = {"DRIVER_CATEGORY": '//a[@id="lbCategoryName"]/@href'}
