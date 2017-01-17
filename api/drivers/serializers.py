@@ -57,6 +57,7 @@ class DriverGroupSerializer(serializers.ModelSerializer):
 
     class Meta:
         fields = (
+            "author",
             "created",
             "drivers",
             "id",

@@ -132,6 +132,9 @@ class Driver(Creatable, Modifiable):
 
 class DriverGroup(Creatable, Modifiable):
 
+    author = models.ForeignKey(
+        "users.User",
+        verbose_name=_("author"))
     drivers = models.ManyToManyField(
         "drivers.Driver", blank=True, verbose_name=_("drivers"))
     name = models.CharField(_("name"), max_length=128)

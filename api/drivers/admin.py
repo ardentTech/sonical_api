@@ -90,6 +90,7 @@ class DriverGroupAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
             "fields": (
+                "author",
                 "drivers",
                 "name"
             )
@@ -99,7 +100,8 @@ class DriverGroupAdmin(admin.ModelAdmin):
             "fields": ("created", "id", "modified",)
         })
     )
-    list_display = ("id", "name", "created", "modified",)
+    # @todo include driver count
+    list_display = ("id", "name", "author", "created", "modified",)
     readonly_fields = ("created", "id", "modified",)
     search_fields = ("name",)
 

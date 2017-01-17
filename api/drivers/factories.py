@@ -1,6 +1,7 @@
 import factory
 
 from manufacturing.factories import ManufacturerFactory
+from users.factories import UserFactory
 
 
 class DriverFactory(factory.DjangoModelFactory):
@@ -14,6 +15,7 @@ class DriverFactory(factory.DjangoModelFactory):
 
 class DriverGroupFactory(factory.DjangoModelFactory):
 
+    author = factory.SubFactory(UserFactory)
     name = factory.Sequence(lambda n: "name-{0}".format(n))
 
     class Meta:

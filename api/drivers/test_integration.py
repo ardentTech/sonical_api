@@ -2,6 +2,7 @@ from django.core.urlresolvers import reverse
 
 from .factories import DriverFactory, DriverGroupFactory
 from manufacturing.factories import ManufacturerFactory
+from users.factories import UserFactory
 from utils.testing import BaseAPITestCase
 
 
@@ -152,6 +153,7 @@ class DriverGroupListTestCase(BaseAPITestCase):
     def test_post_ok(self):
         payload = DriverGroupFactory.attributes()
         payload["drivers"] = [DriverFactory.create().id]
+        payload["author"] = UserFactory.create().id
         response = self.client.post(reverse("api:drivergroup-list"), data=payload, format="json")
         self.assert_post_ok(response)
 
