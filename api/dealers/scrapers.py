@@ -179,12 +179,14 @@ class PartsExpressScraper(DealerScraper):
             ('//div[@class="ProducDetailsNote"]', [
                 # (key, table row column one text, formatter)
                 ("bl_product", "BL Product (BL)", "decimal"),
+                ("cone_surface_area", "Surface Area of Cone (Sd)", "decimal"),
                 ("dc_resistance", "DC Resistance (Re)", "decimal"),
                 ("diaphragm_mass_including_airload", "Diaphragm Mass Inc. Airload (Mms)", "diaphragm"),
                 ("electromagnetic_q", "Electromagnetic Q (Qes)", "decimal"),
                 ("frequency_response", "Frequency Response", "frequency_response"),
                 ("manufacturer", "Brand", "manufacturer"),
                 ("max_power", "Power Handling (max)", "int"),
+                ("maximum_linear_excursion", "Maximum Linear Excursion (Xmax)", "decimal"),
                 ("mechanical_q", "Mechanical Q (Qms)", "decimal"),
                 ("nominal_diameter", "Nominal Diameter", "diameter"),
                 ("nominal_impedance", "Impedance", "decimal"),

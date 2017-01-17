@@ -14,6 +14,12 @@ class Driver(Creatable, Modifiable):
         decimal_places=2,
         max_digits=5,
         null=True)
+    cone_surface_area = models.DecimalField(
+        _("Surface Area of Cone (cm**2)"),
+        blank=True,
+        decimal_places=2,
+        max_digits=5,
+        null=True)
     dc_resistance = models.DecimalField(
         _("DC Resistance (ohms)"),
         blank=True,
@@ -44,6 +50,12 @@ class Driver(Creatable, Modifiable):
     max_power = models.IntegerField(
         _("Max Power (Watts)"),
         blank=True,
+        null=True)
+    maximum_linear_excursion = models.DecimalField(
+        _("Maximum Linear Excursion (mm)"),
+        blank=True,
+        decimal_places=2,
+        max_digits=5,
         null=True)
     mechanical_q = models.DecimalField(
         _("Mechanical Q"),
