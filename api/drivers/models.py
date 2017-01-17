@@ -14,6 +14,12 @@ class Driver(Creatable, Modifiable):
         decimal_places=2,
         max_digits=5,
         null=True)
+    compliance_equivalent_volume = models.DecimalField(
+        _("Compliance Equivalent Volume (ft**3)"),
+        blank=True,
+        decimal_places=2,
+        max_digits=5,
+        null=True)
     cone_surface_area = models.DecimalField(
         _("Surface Area of Cone (cm**2)"),
         blank=True,
@@ -53,6 +59,12 @@ class Driver(Creatable, Modifiable):
         null=True)
     maximum_linear_excursion = models.DecimalField(
         _("Maximum Linear Excursion (mm)"),
+        blank=True,
+        decimal_places=2,
+        max_digits=5,
+        null=True)
+    mechanical_compliance_of_suspension = models.DecimalField(
+        _("Mechanical Compliance of Suspension (mm/N)"),
         blank=True,
         decimal_places=2,
         max_digits=5,

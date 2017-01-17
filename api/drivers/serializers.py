@@ -26,6 +26,7 @@ class DriverSerializer(serializers.ModelSerializer):
     class Meta:
         fields = (
             "bl_product",
+            "compliance_equivalent_volume",
             "cone_surface_area",
             "created",
             "dc_resistance",
@@ -37,6 +38,7 @@ class DriverSerializer(serializers.ModelSerializer):
             "manufacturer",
             "max_power",
             "maximum_linear_excursion",
+            "mechanical_compliance_of_suspension",
             "mechanical_q",
             "model",
             "modified",

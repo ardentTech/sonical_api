@@ -12,6 +12,9 @@ from manufacturing.models import Manufacturer
 from utils.mixins.mode import ModeMixin
 
 
+# @todo what if PE is down?
+
+
 class Scraper(ModeMixin):
 
     SCRAPER_ID = "Sonical Scraper 1.0 (jonathan@ardent.tech)"
@@ -179,6 +182,7 @@ class PartsExpressScraper(DealerScraper):
             ('//div[@class="ProducDetailsNote"]', [
                 # (key, table row column one text, formatter)
                 ("bl_product", "BL Product (BL)", "decimal"),
+                ("compliance_equivalent_volume", "Compliance Equivalent Volume (Vas)", "decimal"),
                 ("cone_surface_area", "Surface Area of Cone (Sd)", "decimal"),
                 ("dc_resistance", "DC Resistance (Re)", "decimal"),
                 ("diaphragm_mass_including_airload", "Diaphragm Mass Inc. Airload (Mms)", "diaphragm"),
@@ -187,6 +191,7 @@ class PartsExpressScraper(DealerScraper):
                 ("manufacturer", "Brand", "manufacturer"),
                 ("max_power", "Power Handling (max)", "int"),
                 ("maximum_linear_excursion", "Maximum Linear Excursion (Xmax)", "decimal"),
+                ("mechanical_compliance_of_suspension", "Mechanical Compliance of Suspension (Cms)", "decimal"),
                 ("mechanical_q", "Mechanical Q (Qms)", "decimal"),
                 ("nominal_diameter", "Nominal Diameter", "diameter"),
                 ("nominal_impedance", "Impedance", "decimal"),

@@ -28,11 +28,13 @@ class DriverAdmin(admin.ModelAdmin):
         ("Thiele-Small", {
             "fields": (
                 "bl_product",
+                "compliance_equivalent_volume",
                 "cone_surface_area",
                 "dc_resistance",
                 "diaphragm_mass_including_airload",
                 "electromagnetic_q",
                 "maximum_linear_excursion",
+                "mechanical_compliance_of_suspension",
                 "mechanical_q",
                 "resonant_frequency",
             )
