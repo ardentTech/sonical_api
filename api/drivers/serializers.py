@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from .models import Driver, DriverGroup, DriverProductListing
-from manufacturing.serializers import ManufacturerSerializer
+from manufacturing.serializers import ManufacturerSerializer, MaterialSerializer
 
 
 class DriverProductListingSerializer(serializers.ModelSerializer):
@@ -20,13 +20,16 @@ class DriverProductListingSerializer(serializers.ModelSerializer):
 
 class DriverSerializer(serializers.ModelSerializer):
 
-    manufacturer = ManufacturerSerializer()
+    cone_material = MaterialSerializer()
     driver_product_listings = DriverProductListingSerializer(many=True)
+    manufacturer = ManufacturerSerializer()
+    surround_material = MaterialSerializer()
 
     class Meta:
         fields = (
             "bl_product",
             "compliance_equivalent_volume",
+            "cone_material",
             "cone_surface_area",
             "created",
             "dc_resistance",
@@ -48,6 +51,7 @@ class DriverSerializer(serializers.ModelSerializer):
             "resonant_frequency",
             "rms_power",
             "sensitivity",
+            "surround_material",
             "voice_coil_diameter",
             "voice_coil_inductance",
         )

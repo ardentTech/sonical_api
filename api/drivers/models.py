@@ -20,6 +20,12 @@ class Driver(Creatable, Modifiable):
         decimal_places=2,
         max_digits=5,
         null=True)
+    cone_material = models.ForeignKey(
+        "manufacturing.Material",
+        blank=True,
+        null=True,
+        related_name="driver_cone_material",
+        verbose_name=_("cone material"))
     cone_surface_area = models.DecimalField(
         _("Surface Area of Cone (cm**2)"),
         blank=True,
@@ -107,6 +113,12 @@ class Driver(Creatable, Modifiable):
         help_text="2.83V/1m",
         max_digits=5,
         null=True)
+    surround_material = models.ForeignKey(
+        "manufacturing.Material",
+        blank=True,
+        null=True,
+        related_name="driver_surround_material",
+        verbose_name=_("surround material"))
     voice_coil_diameter = models.DecimalField(
         _("Voice Coil Diameter (Inches)"),
         blank=True,

@@ -8,7 +8,7 @@ import requests
 
 from dealers.models import DealerScraperReport
 from drivers.models import Driver, DriverProductListing
-from manufacturing.models import Manufacturer
+from manufacturing.models import Manufacturer, Material
 from utils.mixins.mode import ModeMixin
 
 
@@ -31,16 +31,20 @@ class Scraper(ModeMixin):
 class DealerScraper(Scraper):
 
     def __init__(self, scraper_record):
-        self.dealer = scraper_record.dealer
+        self.db_record = scraper_record
+        self.dealer = self.db_record.dealer
         self.base_url = self.dealer.website
-        self.manufacturers = {m.name: m for m in Manufacturer.objects.all()}
+
         self.driver_product_listings = {
             l.path: l for l in DriverProductListing.objects.filter(dealer=self.dealer)}
-        self.db_record = scraper_record
+        self.manufacturers = {m.name: m for m in Manufacturer.objects.all()}
+        self.materials = {m.name: m for m in Material.objects.all()}
 
 
 class RecordProcessor(object):
 
+    # @todo count Manufacturers and Materials created, too
+    # @todo should this handle creating/updating Manufacturers and Materials?
     # @todo should the app have a big file of these constants?
     CREATE = "create"
     DRIVERS = "drivers"
@@ -183,6 +187,7 @@ class PartsExpressScraper(DealerScraper):
                 # (key, table row column one text, formatter)
                 ("bl_product", "BL Product (BL)", "decimal"),
                 ("compliance_equivalent_volume", "Compliance Equivalent Volume (Vas)", "decimal"),
+                ("cone_material", "Cone Material", "material"),
                 ("cone_surface_area", "Surface Area of Cone (Sd)", "decimal"),
                 ("dc_resistance", "DC Resistance (Re)", "decimal"),
                 ("diaphragm_mass_including_airload", "Diaphragm Mass Inc. Airload (Mms)", "diaphragm"),
@@ -198,6 +203,7 @@ class PartsExpressScraper(DealerScraper):
                 ("resonant_frequency", "Resonant Frequency (Fs)", "decimal"),
                 ("rms_power", "Power Handling (RMS)", "int"),
                 ("sensitivity", "Sensitivity", "decimal"),
+                ("cone_material", "Cone Material", "material"),
                 ("voice_coil_diameter", "Voice Coil Diameter", "diameter"),
                 ("voice_coil_inductance", "Voice Coil Inductance (Le)", "decimal"),
             ])
@@ -283,3 +289,10 @@ class PartsExpressScraper(DealerScraper):
         except:
             self.manufacturers[val] = Manufacturer.objects.create(name=val)
             return self.manufacturers[val]
+
+    def _to_material(self, val):
+        try:
+            return self.materials[val]
+        except:
+            self.materials[val] = Material.objects.create(name=val)
+            return self.materials[val]
