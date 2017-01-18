@@ -20,12 +20,12 @@ class Driver(Creatable, Modifiable):
         decimal_places=2,
         max_digits=5,
         null=True)
-    cone_material = models.ForeignKey(
+    cone = models.ForeignKey(
         "manufacturing.Material",
         blank=True,
         null=True,
-        related_name="driver_cone_material",
-        verbose_name=_("cone material"))
+        related_name="driver_cone",
+        verbose_name=_("cone"))
     cone_surface_area = models.DecimalField(
         _("Surface Area of Cone (cm**2)"),
         blank=True,
@@ -113,24 +113,36 @@ class Driver(Creatable, Modifiable):
         help_text="2.83V/1m",
         max_digits=5,
         null=True)
-    surround_material = models.ForeignKey(
+    surround = models.ForeignKey(
         "manufacturing.Material",
         blank=True,
         null=True,
-        related_name="driver_surround_material",
-        verbose_name=_("surround material"))
+        related_name="driver_surround",
+        verbose_name=_("surround"))
     voice_coil_diameter = models.DecimalField(
         _("Voice Coil Diameter (Inches)"),
         blank=True,
         decimal_places=2,
         max_digits=5,
         null=True)
+    voice_coil_former = models.ForeignKey(
+        "manufacturing.Material",
+        blank=True,
+        null=True,
+        related_name="driver_voice_coil_former",
+        verbose_name=_("voice coil former"))
     voice_coil_inductance = models.DecimalField(
         _("Voice Coil Inductance (MilliHenries)"),
         blank=True,
         decimal_places=2,
         max_digits=5,
         null=True)
+    voice_coil_wire = models.ForeignKey(
+        "manufacturing.Material",
+        blank=True,
+        null=True,
+        related_name="driver_voice_coil_wire",
+        verbose_name=_("voice coil wire"))
 
 #    hifi_or_pa (application?)
 #    compliance_equivalent_volume float (ft**3)

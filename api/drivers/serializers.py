@@ -20,16 +20,18 @@ class DriverProductListingSerializer(serializers.ModelSerializer):
 
 class DriverSerializer(serializers.ModelSerializer):
 
-    cone_material = MaterialSerializer()
+    cone = MaterialSerializer()
     driver_product_listings = DriverProductListingSerializer(many=True)
     manufacturer = ManufacturerSerializer()
-    surround_material = MaterialSerializer()
+    surround = MaterialSerializer()
+    voice_coil_former = MaterialSerializer()
+    voice_coil_wire = MaterialSerializer()
 
     class Meta:
         fields = (
             "bl_product",
             "compliance_equivalent_volume",
-            "cone_material",
+            "cone",
             "cone_surface_area",
             "created",
             "dc_resistance",
@@ -51,9 +53,11 @@ class DriverSerializer(serializers.ModelSerializer):
             "resonant_frequency",
             "rms_power",
             "sensitivity",
-            "surround_material",
+            "surround",
             "voice_coil_diameter",
+            "voice_coil_former",
             "voice_coil_inductance",
+            "voice_coil_wire",
         )
         model = Driver
         read_only_fields = ("created", "id", "modified",)

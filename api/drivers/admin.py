@@ -39,6 +39,14 @@ class DriverAdmin(admin.ModelAdmin):
                 "resonant_frequency",
             )
         }),
+        ("Material", {
+            "fields": (
+                "cone",
+                "surround",
+                "voice_coil_former",
+                "voice_coil_wire",
+            )
+        }),
         ("Other", {
             "fields": ("in_production",)
         }),
