@@ -20,15 +20,18 @@ class DriverProductListingSerializer(serializers.ModelSerializer):
 
 class DriverSerializer(serializers.ModelSerializer):
 
+    basket_frame = MaterialSerializer()
     cone = MaterialSerializer()
     driver_product_listings = DriverProductListingSerializer(many=True)
     manufacturer = ManufacturerSerializer()
+    magnet = MaterialSerializer()
     surround = MaterialSerializer()
     voice_coil_former = MaterialSerializer()
     voice_coil_wire = MaterialSerializer()
 
     class Meta:
         fields = (
+            "basket_frame",
             "bl_product",
             "compliance_equivalent_volume",
             "cone",
@@ -40,6 +43,7 @@ class DriverSerializer(serializers.ModelSerializer):
             "id",
             "in_production",
             "frequency_response",
+            "magnet",
             "manufacturer",
             "max_power",
             "maximum_linear_excursion",

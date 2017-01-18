@@ -20,6 +20,12 @@ class Driver(Creatable, Modifiable):
         decimal_places=2,
         max_digits=5,
         null=True)
+    basket_frame = models.ForeignKey(
+        "manufacturing.Material",
+        blank=True,
+        null=True,
+        related_name="driver_basket_frame",
+        verbose_name=_("basket frame"))
     cone = models.ForeignKey(
         "manufacturing.Material",
         blank=True,
@@ -57,6 +63,12 @@ class Driver(Creatable, Modifiable):
     in_production = models.BooleanField(
         _("In Production"),
         default=True)
+    magnet = models.ForeignKey(
+        "manufacturing.Material",
+        blank=True,
+        null=True,
+        related_name="driver_magnet",
+        verbose_name=_("magnet"))
     manufacturer = models.ForeignKey(
         "manufacturing.Manufacturer")
     max_power = models.IntegerField(

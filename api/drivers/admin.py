@@ -41,7 +41,9 @@ class DriverAdmin(admin.ModelAdmin):
         }),
         ("Material", {
             "fields": (
+                "basket_frame",
                 "cone",
+                "magnet",
                 "surround",
                 "voice_coil_former",
                 "voice_coil_wire",

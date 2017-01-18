@@ -185,6 +185,7 @@ class PartsExpressScraper(DealerScraper):
             ]),
             ('//div[@class="ProducDetailsNote"]', [
                 # (key, table row column one text, formatter)
+                ("basket_frame", "Basket / Frame Material", "material"),
                 ("bl_product", "BL Product (BL)", "decimal"),
                 ("compliance_equivalent_volume", "Compliance Equivalent Volume (Vas)", "decimal"),
                 ("cone", "Cone Material", "material"),
@@ -193,6 +194,7 @@ class PartsExpressScraper(DealerScraper):
                 ("diaphragm_mass_including_airload", "Diaphragm Mass Inc. Airload (Mms)", "diaphragm"),
                 ("electromagnetic_q", "Electromagnetic Q (Qes)", "decimal"),
                 ("frequency_response", "Frequency Response", "frequency_response"),
+                ("magnet", "Magnet Material", "material"),
                 ("manufacturer", "Brand", "manufacturer"),
                 ("max_power", "Power Handling (max)", "int"),
                 ("maximum_linear_excursion", "Maximum Linear Excursion (Xmax)", "decimal"),
