@@ -230,7 +230,7 @@ class PartsExpressScraper(DealerScraper):
                 ("magnet", "Magnet Material", None),
                 ("manufacturer", "Brand", None),
                 ("max_power", "Power Handling (max)", "int"),
-                ("maximum_linear_excursion", "Maximum Linear Excursion (Xmax)", "decimal"),
+                ("max_linear_excursion", "Maximum Linear Excursion (Xmax)", "decimal"),
                 ("mechanical_compliance_of_suspension", "Mechanical Compliance of Suspension (Cms)", "decimal"),
                 ("mechanical_q", "Mechanical Q (Qms)", "decimal"),
                 ("nominal_diameter", "Nominal Diameter", "diameter"),

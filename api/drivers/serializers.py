@@ -46,7 +46,7 @@ class DriverSerializer(serializers.ModelSerializer):
             "magnet",
             "manufacturer",
             "max_power",
-            "maximum_linear_excursion",
+            "max_linear_excursion",
             "mechanical_compliance_of_suspension",
             "mechanical_q",
             "model",

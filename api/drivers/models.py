@@ -75,7 +75,7 @@ class Driver(Creatable, Modifiable):
         _("Max Power (Watts)"),
         blank=True,
         null=True)
-    maximum_linear_excursion = models.DecimalField(
+    max_linear_excursion = models.DecimalField(
         _("Maximum Linear Excursion (mm)"),
         blank=True,
         decimal_places=2,

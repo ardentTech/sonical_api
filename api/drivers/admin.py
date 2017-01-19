@@ -33,7 +33,7 @@ class DriverAdmin(admin.ModelAdmin):
                 "dc_resistance",
                 "diaphragm_mass_including_airload",
                 "electromagnetic_q",
-                "maximum_linear_excursion",
+                "max_linear_excursion",
                 "mechanical_compliance_of_suspension",
                 "mechanical_q",
                 "resonant_frequency",
