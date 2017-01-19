@@ -58,6 +58,12 @@ class DealerScraperReport(ScraperReport):
     errors = models.PositiveIntegerField(
         _("errors"),
         default=0)
+    manufacturers_created = models.PositiveIntegerField(
+        _("manufacturers created"),
+        default=0)
+    materials_created = models.PositiveIntegerField(
+        _("materials created"),
+        default=0)
     scraper = models.ForeignKey(
         "dealers.DealerScraper",
         verbose_name=_("scraper"))

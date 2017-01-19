@@ -62,6 +62,8 @@ class DealerScraperReportAdmin(admin.ModelAdmin):
                 "driver_product_listings_created",
                 "driver_product_listings_updated",
                 "errors",
+                "manufacturers_created",
+                "materials_created",
                 "scraper",
             )
         }),
@@ -76,6 +78,8 @@ class DealerScraperReportAdmin(admin.ModelAdmin):
         "drivers_created",
         "driver_product_listings_created",
         "driver_product_listings_updated",
+        "manufacturers_created",
+        "materials_created",
         "errors",
         "created",
     )

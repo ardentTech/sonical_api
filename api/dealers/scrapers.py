@@ -37,25 +37,25 @@ class DealerScraper(Scraper):
 
         self.driver_product_listings = {
             l.path: l for l in DriverProductListing.objects.filter(dealer=self.dealer)}
-        self.manufacturers = {m.name: m for m in Manufacturer.objects.all()}
-        self.materials = {m.name: m for m in Material.objects.all()}
 
 
 class RecordProcessor(object):
 
-    # @todo count Manufacturers and Materials created, too
-    # @todo should this handle creating/updating Manufacturers and Materials?
     # @todo should the app have a big file of these constants?
     CREATE = "create"
     DRIVERS = "drivers"
     LISTINGS = "listings"
+    MANUFACTURERS = "manufacturers"
+    MATERIALS = "materials"
     UPDATE = "update"
     RECORD_METHODS = [CREATE, UPDATE]
-    RECORD_TYPES = [DRIVERS, LISTINGS]
+    RECORD_TYPES = [DRIVERS, LISTINGS, MANUFACTURERS, MATERIALS]
 
     def __init__(self, dealer):
         self.dealer = dealer
         self.errors = []
+        self.manufacturers = {m.name: m for m in Manufacturer.objects.all()}
+        self.materials = {m.name: m for m in Material.objects.all()}
         # @todo should container be a nested class that inherits from dict?
         self.processed = self._get_container()
         self.unprocessed = self._get_container()
@@ -67,6 +67,8 @@ class RecordProcessor(object):
             "drivers_created": len(self._drivers_created()),
             "driver_product_listings_created": len(self._listings_created()),
             "driver_product_listings_updated": len(self._listings_updated()),
+            "manufacturers_created": len(self._manufacturers_created()),
+            "materials_created": len(self._materials_created()),
             "errors": len(self.errors)}
 
     def queue_driver(self, record):
@@ -75,18 +77,40 @@ class RecordProcessor(object):
     def queue_listing(self, record, update=False):
         self._queue_record(self.LISTINGS, record, update)
 
-    def _get_container(self):
-        container = {}
-        for _type in self.RECORD_TYPES:
-            container[_type] = {method: [] for method in self.RECORD_METHODS}
-        return container
-
     # @todo should these be getters/setters?
     def _drivers_created(self):
         return self.processed[self.DRIVERS][self.CREATE]
 
     def _drivers_to_create(self):
         return self.unprocessed[self.DRIVERS][self.CREATE]
+
+    def _format_driver(self, attrs):
+        attrs["manufacturer"] = self._get_or_create(
+            Manufacturer, attrs["manufacturer"])
+        for item in [
+                "basket_frame", "cone", "magnet",
+                "surround", "voice_coil_former", "voice_coil_wire"]:
+            if item in attrs:
+                attrs[item] = self._get_or_create(
+                    Material, attrs[item])
+        return Driver(**attrs)
+
+    def _get_container(self):
+        container = {}
+        for _type in self.RECORD_TYPES:
+            container[_type] = {method: [] for method in self.RECORD_METHODS}
+        return container
+
+    def _get_or_create(self, cls, name):
+        key = cls.__name__.lower() + "s"
+        records = getattr(self, key)
+        try:
+            return records[name]
+        except:
+            new_obj = cls.objects.create(name=name)
+            records[name] = new_obj
+            self.processed[key][self.CREATE].append(new_obj)
+            return records[name]
 
     def _listings_created(self):
         return self.processed[self.LISTINGS][self.CREATE]
@@ -100,10 +124,19 @@ class RecordProcessor(object):
     def _listings_to_update(self):
         return self.unprocessed[self.LISTINGS][self.UPDATE]
 
+    def _manufacturers_created(self):
+        return self.processed[self.MANUFACTURERS][self.CREATE]
+
+    def _materials_created(self):
+        return self.processed[self.MATERIALS][self.CREATE]
+
     def _process_drivers(self):
         try:
+            # @todo update manufacturer and materials here
+            _drivers = list(map(
+                self._format_driver, self._drivers_to_create()))
             self.processed[self.DRIVERS][self.CREATE] = Driver.objects.bulk_create(
-                self._drivers_to_create())
+                _drivers)
         except Exception as e:
             self.errors.append("_process_drivers(): " + repr(e))
 
@@ -161,7 +194,7 @@ class PartsExpressScraper(DealerScraper):
                     self.record_processor.queue_listing(existing_listing, True)
                 else:  # create driver and listing
                     self.record_processor.queue_driver(
-                        Driver(**self._scrape_driver(listing["path"])))
+                        self._scrape_driver(listing["path"]))
                     self.record_processor.queue_listing(listing)
 
         self._create_report(self.record_processor.process())
@@ -185,17 +218,17 @@ class PartsExpressScraper(DealerScraper):
             ]),
             ('//div[@class="ProducDetailsNote"]', [
                 # (key, table row column one text, formatter)
-                ("basket_frame", "Basket / Frame Material", "material"),
+                ("basket_frame", "Basket / Frame Material", None),
                 ("bl_product", "BL Product (BL)", "decimal"),
                 ("compliance_equivalent_volume", "Compliance Equivalent Volume (Vas)", "decimal"),
-                ("cone", "Cone Material", "material"),
+                ("cone", "Cone Material", None),
                 ("cone_surface_area", "Surface Area of Cone (Sd)", "decimal"),
                 ("dc_resistance", "DC Resistance (Re)", "decimal"),
                 ("diaphragm_mass_including_airload", "Diaphragm Mass Inc. Airload (Mms)", "diaphragm"),
                 ("electromagnetic_q", "Electromagnetic Q (Qes)", "decimal"),
                 ("frequency_response", "Frequency Response", "frequency_response"),
-                ("magnet", "Magnet Material", "material"),
-                ("manufacturer", "Brand", "manufacturer"),
+                ("magnet", "Magnet Material", None),
+                ("manufacturer", "Brand", None),
                 ("max_power", "Power Handling (max)", "int"),
                 ("maximum_linear_excursion", "Maximum Linear Excursion (Xmax)", "decimal"),
                 ("mechanical_compliance_of_suspension", "Mechanical Compliance of Suspension (Cms)", "decimal"),
@@ -205,11 +238,11 @@ class PartsExpressScraper(DealerScraper):
                 ("resonant_frequency", "Resonant Frequency (Fs)", "decimal"),
                 ("rms_power", "Power Handling (RMS)", "int"),
                 ("sensitivity", "Sensitivity", "decimal"),
-                ("surround", "Surround Material", "material"),
+                ("surround", "Surround Material", None),
                 ("voice_coil_diameter", "Voice Coil Diameter", "diameter"),
-                ("voice_coil_former", "Voice Coil Former", "material"),
+                ("voice_coil_former", "Voice Coil Former", None),
                 ("voice_coil_inductance", "Voice Coil Inductance (Le)", "decimal"),
-                ("voice_coil_wire", "Voice Coil Wire Material", "material"),
+                ("voice_coil_wire", "Voice Coil Wire Material", None),
             ])
         ]
 
@@ -232,7 +265,7 @@ class PartsExpressScraper(DealerScraper):
                     pass
 
         # @todo need a cleaner way to do this type of thing
-        data["model"] = data["model"].lstrip("{0}".format(data["manufacturer"].name))
+        data["model"] = data["model"].lstrip("{0}".format(data["manufacturer"]))
 
         return data
 
@@ -286,17 +319,3 @@ class PartsExpressScraper(DealerScraper):
     def _to_frequency_response(self, val):
         parts = val.replace(",", "").split(" ")
         return (Decimal(parts[0]), Decimal(parts[2]))
-
-    def _to_manufacturer(self, val):
-        try:
-            return self.manufacturers[val]
-        except:
-            self.manufacturers[val] = Manufacturer.objects.create(name=val)
-            return self.manufacturers[val]
-
-    def _to_material(self, val):
-        try:
-            return self.materials[val]
-        except:
-            self.materials[val] = Material.objects.create(name=val)
-            return self.materials[val]
