@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from .models import Driver, DriverGroup, DriverProductListing
 from manufacturing.serializers import ManufacturerSerializer, MaterialSerializer
+from utils.serializers import IntegerRangeField
 
 
 class DriverProductListingSerializer(serializers.ModelSerializer):
@@ -23,6 +24,7 @@ class DriverSerializer(serializers.ModelSerializer):
     basket_frame = MaterialSerializer()
     cone = MaterialSerializer()
     driver_product_listings = DriverProductListingSerializer(many=True)
+    frequency_response = IntegerRangeField()
     manufacturer = ManufacturerSerializer()
     magnet = MaterialSerializer()
     surround = MaterialSerializer()
