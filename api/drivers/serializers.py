@@ -1,15 +1,19 @@
 from rest_framework import serializers
 
 from .models import Driver, DriverGroup, DriverProductListing
+from dealers.serializers import DealerSerializer
 from manufacturing.serializers import ManufacturerSerializer, MaterialSerializer
 from utils.serializers import IntegerRangeField
 
 
 class DriverProductListingSerializer(serializers.ModelSerializer):
 
+    dealer = DealerSerializer()
+
     class Meta:
         fields = (
             "created",
+            "dealer",
             "id",
             "modified",
             "path",
@@ -25,8 +29,8 @@ class DriverSerializer(serializers.ModelSerializer):
     cone = MaterialSerializer()
     driver_product_listings = DriverProductListingSerializer(many=True)
     frequency_response = IntegerRangeField()
-    manufacturer = ManufacturerSerializer()
     magnet = MaterialSerializer()
+    manufacturer = ManufacturerSerializer()
     surround = MaterialSerializer()
     voice_coil_former = MaterialSerializer()
     voice_coil_wire = MaterialSerializer()
