@@ -9,13 +9,24 @@ class Scraper(object):
 
     SCRAPER_ID = "Sonical Scraper 1.0 (jonathan@ardent.tech)"
 
-    def get_html(self, url):
+    def __init__(self, base_url):
+        self.base_url = base_url
+        self.data = {}
+
+    def get_data(self, key=None):
+        return self.data if key is None else self.data[key]
+
+    def get_html(self, path):
         sleep(1)  # avoid barraging server
-        page = requests.get(url, headers={"user-agent": self.SCRAPER_ID})
+        page = requests.get(
+            self.base_url + path, headers={"user-agent": self.SCRAPER_ID})
         return html.fromstring(page.content)
 
     def run(self):
         raise Exception("Scrapers must implement a `run` method.")
+
+    def set_data(self, key, value):
+        self.data[key] = value
 
 
 class DealerScraper(Scraper):
@@ -27,6 +38,7 @@ class DealerScraper(Scraper):
     def __init__(self, db_record):
         self.db_record = db_record
         self.dealer = self.db_record.dealer
+        super(DealerScraper, self).__init__(self.dealer.website)
 
 
 class PathScraper(Scraper):
@@ -34,18 +46,7 @@ class PathScraper(Scraper):
     Responsible for scraping a path and returning a dict.
     """
 
-    def __init__(self, base_url):
-        self.base_url = base_url
-        self.data = {}
-
-    def add_data(self, key, value):
-        self.data[key] = value
-
-    def build_url(self, path):
-        return self.base_url + path
-
-    def get_result(self):
-        return self.data
+    pass
 
 
 class CategoryScraper(PathScraper):
@@ -55,21 +56,78 @@ class CategoryScraper(PathScraper):
     }
 
     def run(self, path):
-        categories = self.get_html(
-            self.build_url(path)).xpath(self.PATTERNS["path"])
+        categories = self.get_html(path).xpath(self.PATTERNS["path"])
         data = [c for c in categories if not re.search(r"replace|recone", c)]
-        self.add_data("categories", data)
+        self.set_data("categories", data)
         return self
 
 
 class DriverScraper(PathScraper):
-    pass
+
+    PATTERNS = [
+        {
+            "id": "overview",
+            "scope": '//div[@id="MiddleColumn1"]',
+            "base_pattern": '{0}',
+            "items": [
+                # (django key, PE matcher, post_scrape)
+                ("model", 'h1[@class="ProductTitle"]/span/text()', "")]
+        },
+        {
+            "id": "details",
+            "scope": '//div[@class="ProducDetailsNote"]',
+            "base_pattern": 'span[text()="{0}"]/following-sibling::span[1]/text()',
+            "items": [
+                # (django key, PE matcher, post_scrape)
+                ("basket_frame", "Basket / Frame Material", None),
+                ("bl_product", "BL Product (BL)", "decimal"),
+                ("compliance_equivalent_volume", "Compliance Equivalent Volume (Vas)", "decimal"),
+                ("cone", "Cone Material", None),
+                ("cone_surface_area", "Surface Area of Cone (Sd)", "decimal"),
+                ("dc_resistance", "DC Resistance (Re)", "decimal"),
+                ("diaphragm_mass_including_airload", "Diaphragm Mass Inc. Airload (Mms)", "diaphragm"),
+                ("electromagnetic_q", "Electromagnetic Q (Qes)", "decimal"),
+                ("frequency_response", "Frequency Response", "frequency_response"),
+                ("magnet", "Magnet Material", None),
+                ("manufacturer", "Brand", None),
+                ("max_power", "Power Handling (max)", "int"),
+                ("max_linear_excursion", "Maximum Linear Excursion (Xmax)", "decimal"),
+                ("mechanical_compliance_of_suspension", "Mechanical Compliance of Suspension (Cms)", "decimal"),
+                ("mechanical_q", "Mechanical Q (Qms)", "decimal"),
+                ("nominal_diameter", "Nominal Diameter", "diameter"),
+                ("nominal_impedance", "Impedance", "decimal"),
+                ("resonant_frequency", "Resonant Frequency (Fs)", "decimal"),
+                ("rms_power", "Power Handling (RMS)", "int"),
+                ("sensitivity", "Sensitivity", "decimal"),
+                ("surround", "Surround Material", None),
+                ("voice_coil_diameter", "Voice Coil Diameter", "diameter"),
+                ("voice_coil_former", "Voice Coil Former", None),
+                ("voice_coil_inductance", "Voice Coil Inductance (Le)", "decimal"),
+                ("voice_coil_wire", "Voice Coil Wire Material", None)]
+        }
+    ]
+
+    def run(self, path):
+        tree = self.get_html(path)
+
+        for section in self.PATTERNS:
+            scope = tree.xpath(section["scope"])[0]
+            for items in section["items"]:
+                try:
+                    val = scope.xpath(".//" + section["pattern"].format(items[1]))[0]
+                    if items[2]:
+#                        val = getattr(self, "_to_" + items[2])(val)
+                        print("run post_scrape")
+                    self.set_data(items[0], val)
+                except:
+                    pass
+#    data["model"] = data["model"].lstrip("{0}".format(data["manufacturer"]))
 
 
 class DriverListingScraper(PathScraper):
 
     PATTERNS = {
-        "next_page": '//a[@id="ctl00_ctl00_MainContent_uxEBCategory_uxEBProductList_uxBottomPagingLinks_aNextNav"]',
+        "next_page": '//a[@id="ctl00_ctl00_MainContent_uxEBCategory_uxEBProductList_uxBottomPagingLinks_aNextNav"]/@href',
         "listing": {
             "scope": '//a[@id="GridViewProdLink"]',
             "path": './/@href',
@@ -78,26 +136,46 @@ class DriverListingScraper(PathScraper):
     }
 
     def run(self, path):
-        tree = self.get_html(self.build_url(path))
+        tree = self.get_html(path)
         for listing in tree.xpath(self.PATTERNS["listing"]["scope"]):
-            self.add_data(
+            self.set_data(
                 listing.xpath(self.PATTERNS["listing"]["path"])[0],
                 listing.xpath(self.PATTERNS["listing"]["price"])[0])
-
         try:
-            self.run(tree.xpath(self.PATTERNS["next_page"])[0])
+            self.set_data("next_page", tree.xpath(self.PATTERNS["next_page"])[0])
         except IndexError:
             pass
         return self
 
 
+# @todo want to be able to write self.data.set() and self.data.get()
 class PartsExpressScraper(DealerScraper):
 
+    DATA = {"categories": [], "drivers": [], "driver_listings": []}
     SEED = "/cat/hi-fi-woofers-subwoofers-midranges-tweeters/13"
 
     def run(self):
-        base_url = self.dealer.website
-        result = CategoryScraper(base_url).run(self.SEED).get_result()
-        for path in result["categories"]:
-            res = DriverListingScraper(base_url).run(path).get_result()
-            print("{0}".format(res))
+        self._get_categories(self.SEED)
+#        for path in self.DATA["categories"]:
+#            print("{0}".format(self.DATA["categories"]))
+#            self._get_driver_listings(path)
+
+        print("{0}".format(self.DATA))
+
+    def _get_categories(self, path):
+        self.DATA["categories"] = CategoryScraper(
+            self.base_url).run(path).get_data()["categories"]
+
+#    def _get_driver_listings(self, path):
+#        res = DriverListingScraper(self.base_url).run(path).get_data()
+#        next_page = res.pop("next_page", None)
+#        self.DATA["driver_listings"] + [{} for path, price in res.items()]
+#        try:
+#            self.set_data(
+#                "driver_listings", self.get_data("driver_listings") + res)
+#        except KeyError:
+#            self.set_data("driver_listings", res)
+#
+#        # handle pagination
+#        if next_page is not None:
+#            self._get_driver_listings(next_page)
