@@ -5,16 +5,22 @@ from lxml import html
 import requests
 
 
+# @todo DriverScraper
+
+
 class ScraperData(object):
 
     def __init__(self):
-        self.data = {}
+        self._data = {"items": []}
 
-    def set(self, key, val):
-        self.data[key] = val
+    def concat(self, key, data):
+        self._data[key] += data
 
     def get(self, key=None):
-        return self.data if key is None else self.data[key]
+        return self._data if key is None else self._data[key]
+
+    def set(self, key, val):
+        self._data[key] = val
 
 
 class Scraper(object):
@@ -63,8 +69,9 @@ class CategoryScraper(PathScraper):
 
     def run(self, path):
         categories = self.get_html(path).xpath(self.PATTERNS["path"])
-        data = [c for c in categories if not re.search(r"replace|recone", c)]
-        self.data.set("categories", data)
+        self.data.set(
+            "items",
+            [{"path": c} for c in categories if not re.search(r"replace|recone", c)])
         return self
 
 
@@ -144,9 +151,10 @@ class DriverListingScraper(PathScraper):
     def run(self, path):
         tree = self.get_html(path)
         for listing in tree.xpath(self.PATTERNS["listing"]["scope"]):
-            self.data.set(
-                listing.xpath(self.PATTERNS["listing"]["path"])[0],
-                listing.xpath(self.PATTERNS["listing"]["price"])[0])
+            self.data.concat("items", {
+                "path": listing.xpath(self.PATTERNS["listing"]["path"])[0],
+                "price": listing.xpath(self.PATTERNS["listing"]["price"])[0]
+            })
         try:
             self.data.set("next_page", tree.xpath(self.PATTERNS["next_page"])[0])
         except IndexError:
@@ -163,8 +171,8 @@ class PartsExpressScraper(DealerScraper):
         print("{0}".format(self.data.get()))
 
     def _scrape_categories(self, path):
-        self.data.set("categories", CategoryScraper(
-            self.base_url).run(path).data.get()["categories"])
+        self.data.set("items", CategoryScraper(
+            self.base_url).run(path).data.get()["items"])
 
 #    def _get_driver_listings(self, path):
 #        res = DriverListingScraper(self.base_url).run(path).get_data()
