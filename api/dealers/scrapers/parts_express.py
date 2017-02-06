@@ -1,3 +1,4 @@
+from decimal import Decimal
 import re
 from time import sleep
 
@@ -13,8 +14,14 @@ class ScraperData(object):
     def __init__(self):
         self._data = {"items": []}
 
+    def add(self, key, data):
+        self._data[key].append(data)
+
     def concat(self, key, data):
-        self._data[key] += data
+        try:
+            self._data[key] += data
+        except KeyError:
+            self._data[key] = data
 
     def get(self, key=None):
         return self._data if key is None else self._data[key]
@@ -63,9 +70,7 @@ class PathScraper(Scraper):
 
 class CategoryScraper(PathScraper):
 
-    PATTERNS = {
-        "path": '//a[@id="lbCategoryName"]/@href'
-    }
+    PATTERNS = {"path": '//a[@id="lbCategoryName"]/@href'}
 
     def run(self, path):
         categories = self.get_html(path).xpath(self.PATTERNS["path"])
@@ -83,58 +88,84 @@ class DriverScraper(PathScraper):
             "scope": '//div[@id="MiddleColumn1"]',
             "base_pattern": '{0}',
             "items": [
-                # (django key, PE matcher, post_scrape)
-                ("model", 'h1[@class="ProductTitle"]/span/text()', "")]
-        },
+                # (django key, PE pattern, post_scrape)
+                ("model", 'h1[@class="ProductTitle"]/span/text()', "")]},
         {
             "id": "details",
             "scope": '//div[@class="ProducDetailsNote"]',
             "base_pattern": 'span[text()="{0}"]/following-sibling::span[1]/text()',
             "items": [
-                # (django key, PE matcher, post_scrape)
+                # (django key, PE pattern, post_scrape)
                 ("basket_frame", "Basket / Frame Material", None),
-                ("bl_product", "BL Product (BL)", "decimal"),
-                ("compliance_equivalent_volume", "Compliance Equivalent Volume (Vas)", "decimal"),
+                ("bl_product", "BL Product (BL)", "_to_decimal"),
+                ("compliance_equivalent_volume", "Compliance Equivalent Volume (Vas)", "_to_decimal"),
                 ("cone", "Cone Material", None),
-                ("cone_surface_area", "Surface Area of Cone (Sd)", "decimal"),
-                ("dc_resistance", "DC Resistance (Re)", "decimal"),
-                ("diaphragm_mass_including_airload", "Diaphragm Mass Inc. Airload (Mms)", "diaphragm"),
-                ("electromagnetic_q", "Electromagnetic Q (Qes)", "decimal"),
-                ("frequency_response", "Frequency Response", "frequency_response"),
+                ("cone_surface_area", "Surface Area of Cone (Sd)", "_to_decimal"),
+                ("dc_resistance", "DC Resistance (Re)", "_to_decimal"),
+                ("diaphragm_mass_including_airload", "Diaphragm Mass Inc. Airload (Mms)", "_to_diaphragm"),
+                ("electromagnetic_q", "Electromagnetic Q (Qes)", "_to_decimal"),
+                ("frequency_response", "Frequency Response", "_to_frequency_response"),
                 ("magnet", "Magnet Material", None),
                 ("manufacturer", "Brand", None),
-                ("max_power", "Power Handling (max)", "int"),
-                ("max_linear_excursion", "Maximum Linear Excursion (Xmax)", "decimal"),
-                ("mechanical_compliance_of_suspension", "Mechanical Compliance of Suspension (Cms)", "decimal"),
-                ("mechanical_q", "Mechanical Q (Qms)", "decimal"),
-                ("nominal_diameter", "Nominal Diameter", "diameter"),
-                ("nominal_impedance", "Impedance", "decimal"),
-                ("resonant_frequency", "Resonant Frequency (Fs)", "decimal"),
-                ("rms_power", "Power Handling (RMS)", "int"),
-                ("sensitivity", "Sensitivity", "decimal"),
+                ("max_power", "Power Handling (max)", "_to_int"),
+                ("max_linear_excursion", "Maximum Linear Excursion (Xmax)", "_to_decimal"),
+                ("mechanical_compliance_of_suspension", "Mechanical Compliance of Suspension (Cms)", "_to_decimal"),
+                ("mechanical_q", "Mechanical Q (Qms)", "_to_decimal"),
+                ("nominal_diameter", "Nominal Diameter", "_to_diameter"),
+                ("nominal_impedance", "Impedance", "_to_decimal"),
+                ("resonant_frequency", "Resonant Frequency (Fs)", "_to_decimal"),
+                ("rms_power", "Power Handling (RMS)", "_to_int"),
+                ("sensitivity", "Sensitivity", "_to_decimal"),
                 ("surround", "Surround Material", None),
-                ("voice_coil_diameter", "Voice Coil Diameter", "diameter"),
+                ("voice_coil_diameter", "Voice Coil Diameter", "_to_diameter"),
                 ("voice_coil_former", "Voice Coil Former", None),
-                ("voice_coil_inductance", "Voice Coil Inductance (Le)", "decimal"),
-                ("voice_coil_wire", "Voice Coil Wire Material", None)]
-        }
-    ]
+                ("voice_coil_inductance", "Voice Coil Inductance (Le)", "_to_decimal"),
+                ("voice_coil_wire", "Voice Coil Wire Material", None)]}]
 
     def run(self, path):
         tree = self.get_html(path)
 
         for section in self.PATTERNS:
             scope = tree.xpath(section["scope"])[0]
-            for items in section["items"]:
+            for item in section["items"]:
+                key = item[0]
+                pattern = ".//" + section["base_pattern"].format(item[1])
+                post_scrape = item[2]
                 try:
-                    val = scope.xpath(".//" + section["pattern"].format(items[1]))[0]
-                    if items[2]:
-#                        val = getattr(self, "_to_" + items[2])(val)
-                        print("run post_scrape")
-                    self.data.set(items[0], val)
-                except:
+                    val = scope.xpath(pattern)[0]
+                    if post_scrape:
+                        val = getattr(self, post_scrape)(val)
+                    self.data.set(key, val)
+                except Exception:
                     pass
-#    data["model"] = data["model"].lstrip("{0}".format(data["manufacturer"]))
+
+        # @todo this sucks but will have to do for now
+        self.data.set(
+            "model", self.data.get("model").lstrip(self.data.get("manufacturer")))
+        return self
+
+    def _to_decimal(self, val):
+        return Decimal(val.split(" ")[0])
+
+    def _to_diameter(self, val):
+        _val = val.rstrip("\"")
+        if "-" in _val:
+            parts = _val.split("-")
+            whole_number = parts[0]
+            fraction = parts[1].split("/")
+            decimal_digits = fraction[0] / fraction[1]
+            _val = whole_number + "." + decimal_digits
+        return Decimal(_val)
+
+    def _to_diaphragm(self, val):
+        return Decimal(val.rstrip("g"))
+
+    def _to_int(self, val):
+        return int(val.split(" ")[0])
+
+    def _to_frequency_response(self, val):
+        parts = val.replace(",", "").split(" ")
+        return (Decimal(parts[0]), Decimal(parts[2]))
 
 
 class DriverListingScraper(PathScraper):
@@ -144,21 +175,19 @@ class DriverListingScraper(PathScraper):
         "listing": {
             "scope": '//a[@id="GridViewProdLink"]',
             "path": './/@href',
-            "price": './/div[@class="CatPriceSection"]/div/div/span[2]/text()',
-        }
-    }
+            "price": './/div[@class="CatPriceSection"]/div/div/span[2]/text()'}}
 
     def run(self, path):
         tree = self.get_html(path)
         for listing in tree.xpath(self.PATTERNS["listing"]["scope"]):
-            self.data.concat("items", {
+            self.data.add("items", {
                 "path": listing.xpath(self.PATTERNS["listing"]["path"])[0],
                 "price": listing.xpath(self.PATTERNS["listing"]["price"])[0]
             })
         try:
             self.data.set("next_page", tree.xpath(self.PATTERNS["next_page"])[0])
         except IndexError:
-            pass
+            self.data.set("next_page", None)
         return self
 
 
@@ -168,22 +197,22 @@ class PartsExpressScraper(DealerScraper):
 
     def run(self):
         self._scrape_categories(self.SEED)
-        print("{0}".format(self.data.get()))
+        for category in self.data.get("categories"):
+            self._scrape_driver_listings(category["path"])
+        for driver_listing in self.data.get("driver_listings"):
+            self._scrape_driver(driver_listing["path"])
 
     def _scrape_categories(self, path):
-        self.data.set("items", CategoryScraper(
+        self.data.set("categories", CategoryScraper(
             self.base_url).run(path).data.get()["items"])
 
-#    def _get_driver_listings(self, path):
-#        res = DriverListingScraper(self.base_url).run(path).get_data()
-#        next_page = res.pop("next_page", None)
-#        self.DATA["driver_listings"] + [{} for path, price in res.items()]
-#        try:
-#            self.data.set(
-#                "driver_listings", self.get_data("driver_listings") + res)
-#        except KeyError:
-#            self.data.set("driver_listings", res)
-#
-#        # handle pagination
-#        if next_page is not None:
-#            self._get_driver_listings(next_page)
+    def _scrape_driver(self, path):
+        res = DriverScraper(self.base_url).run(path).data.get()
+        print("{0}".format(res))
+
+    def _scrape_driver_listings(self, path):
+        res = DriverListingScraper(self.base_url).run(path).data.get()
+        self.data.concat("driver_listings", res["items"])
+        # handle pagination
+        if res["next_page"] is not None:
+            self._scrape_driver_listings(res["next_page"])
