@@ -50,13 +50,16 @@ class PathScraper(Scraper):
 
 class CategoryScraper(PathScraper):
 
-    DRIVER_CATEGORY = '//a[@id="lbCategoryName"]/@href'
+    PATTERNS = {
+        "path": '//a[@id="lbCategoryName"]/@href'
+    }
 
     def run(self, path):
         categories = self.get_html(
-            self.build_url(path)).xpath(self.DRIVER_CATEGORY)
+            self.build_url(path)).xpath(self.PATTERNS["path"])
         data = [c for c in categories if not re.search(r"replace|recone", c)]
         self.add_data("categories", data)
+        return self
 
 
 class DriverScraper(PathScraper):
@@ -64,7 +67,28 @@ class DriverScraper(PathScraper):
 
 
 class DriverListingScraper(PathScraper):
-    pass
+
+    PATTERNS = {
+        "next_page": '//a[@id="ctl00_ctl00_MainContent_uxEBCategory_uxEBProductList_uxBottomPagingLinks_aNextNav"]',
+        "listing": {
+            "scope": '//a[@id="GridViewProdLink"]',
+            "path": './/@href',
+            "price": './/div[@class="CatPriceSection"]/div/div/span[2]/text()',
+        }
+    }
+
+    def run(self, path):
+        tree = self.get_html(self.build_url(path))
+        for listing in tree.xpath(self.PATTERNS["listing"]["scope"]):
+            self.add_data(
+                listing.xpath(self.PATTERNS["listing"]["path"])[0],
+                listing.xpath(self.PATTERNS["listing"]["price"])[0])
+
+        try:
+            self.run(tree.xpath(self.PATTERNS["next_page"])[0])
+        except IndexError:
+            pass
+        return self
 
 
 class PartsExpressScraper(DealerScraper):
@@ -72,6 +96,8 @@ class PartsExpressScraper(DealerScraper):
     SEED = "/cat/hi-fi-woofers-subwoofers-midranges-tweeters/13"
 
     def run(self):
-        category_scraper = CategoryScraper(self.dealer.website)
-        category_scraper.run(self.SEED)
-        print("{0}".format(category_scraper.get_result()))
+        base_url = self.dealer.website
+        result = CategoryScraper(base_url).run(self.SEED).get_result()
+        for path in result["categories"]:
+            res = DriverListingScraper(base_url).run(path).get_result()
+            print("{0}".format(res))
