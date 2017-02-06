@@ -5,16 +5,25 @@ from lxml import html
 import requests
 
 
+class ScraperData(object):
+
+    def __init__(self):
+        self.data = {}
+
+    def set(self, key, val):
+        self.data[key] = val
+
+    def get(self, key=None):
+        return self.data if key is None else self.data[key]
+
+
 class Scraper(object):
 
     SCRAPER_ID = "Sonical Scraper 1.0 (jonathan@ardent.tech)"
 
     def __init__(self, base_url):
         self.base_url = base_url
-        self.data = {}
-
-    def get_data(self, key=None):
-        return self.data if key is None else self.data[key]
+        self.data = ScraperData()
 
     def get_html(self, path):
         sleep(1)  # avoid barraging server
@@ -24,9 +33,6 @@ class Scraper(object):
 
     def run(self):
         raise Exception("Scrapers must implement a `run` method.")
-
-    def set_data(self, key, value):
-        self.data[key] = value
 
 
 class DealerScraper(Scraper):
@@ -58,7 +64,7 @@ class CategoryScraper(PathScraper):
     def run(self, path):
         categories = self.get_html(path).xpath(self.PATTERNS["path"])
         data = [c for c in categories if not re.search(r"replace|recone", c)]
-        self.set_data("categories", data)
+        self.data.set("categories", data)
         return self
 
 
@@ -118,7 +124,7 @@ class DriverScraper(PathScraper):
                     if items[2]:
 #                        val = getattr(self, "_to_" + items[2])(val)
                         print("run post_scrape")
-                    self.set_data(items[0], val)
+                    self.data.set(items[0], val)
                 except:
                     pass
 #    data["model"] = data["model"].lstrip("{0}".format(data["manufacturer"]))
@@ -138,43 +144,37 @@ class DriverListingScraper(PathScraper):
     def run(self, path):
         tree = self.get_html(path)
         for listing in tree.xpath(self.PATTERNS["listing"]["scope"]):
-            self.set_data(
+            self.data.set(
                 listing.xpath(self.PATTERNS["listing"]["path"])[0],
                 listing.xpath(self.PATTERNS["listing"]["price"])[0])
         try:
-            self.set_data("next_page", tree.xpath(self.PATTERNS["next_page"])[0])
+            self.data.set("next_page", tree.xpath(self.PATTERNS["next_page"])[0])
         except IndexError:
             pass
         return self
 
 
-# @todo want to be able to write self.data.set() and self.data.get()
 class PartsExpressScraper(DealerScraper):
 
-    DATA = {"categories": [], "drivers": [], "driver_listings": []}
     SEED = "/cat/hi-fi-woofers-subwoofers-midranges-tweeters/13"
 
     def run(self):
-        self._get_categories(self.SEED)
-#        for path in self.DATA["categories"]:
-#            print("{0}".format(self.DATA["categories"]))
-#            self._get_driver_listings(path)
+        self._scrape_categories(self.SEED)
+        print("{0}".format(self.data.get()))
 
-        print("{0}".format(self.DATA))
-
-    def _get_categories(self, path):
-        self.DATA["categories"] = CategoryScraper(
-            self.base_url).run(path).get_data()["categories"]
+    def _scrape_categories(self, path):
+        self.data.set("categories", CategoryScraper(
+            self.base_url).run(path).data.get()["categories"])
 
 #    def _get_driver_listings(self, path):
 #        res = DriverListingScraper(self.base_url).run(path).get_data()
 #        next_page = res.pop("next_page", None)
 #        self.DATA["driver_listings"] + [{} for path, price in res.items()]
 #        try:
-#            self.set_data(
+#            self.data.set(
 #                "driver_listings", self.get_data("driver_listings") + res)
 #        except KeyError:
-#            self.set_data("driver_listings", res)
+#            self.data.set("driver_listings", res)
 #
 #        # handle pagination
 #        if next_page is not None:
