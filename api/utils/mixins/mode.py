@@ -3,7 +3,8 @@ from django.conf import settings
 
 class ModeMixin(object):
     """
-    Convenient and human-friendly access to the app-wide Django DEBUG setting
+    Convenient and human-friendly interface to the app-wide Django DEBUG
+    setting.
     """
 
     DEV_MODE = "dev"

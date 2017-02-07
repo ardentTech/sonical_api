@@ -5,8 +5,7 @@ from time import sleep
 from lxml import html
 import requests
 
-
-# @todo DriverScraper
+from utils.mixins.mode import ModeMixin
 
 
 class ScraperData(object):
@@ -191,28 +190,29 @@ class DriverListingScraper(PathScraper):
         return self
 
 
-class PartsExpressScraper(DealerScraper):
+class PartsExpressScraper(ModeMixin, DealerScraper):
 
     SEED = "/cat/hi-fi-woofers-subwoofers-midranges-tweeters/13"
 
     def run(self):
-        self._scrape_categories(self.SEED)
+        category_limit = 1 if self.dev_mode() else None
+        should_paginate = False if self.dev_mode() else True
+
+        self._scrape_categories(self.SEED, category_limit)
         for category in self.data.get("categories"):
-            self._scrape_driver_listings(category["path"])
+            self._scrape_driver_listings(category["path"], should_paginate)
         for driver_listing in self.data.get("driver_listings"):
             self._scrape_driver(driver_listing["path"])
 
-    def _scrape_categories(self, path):
+    def _scrape_categories(self, path, limit):
         self.data.set("categories", CategoryScraper(
-            self.base_url).run(path).data.get()["items"])
+            self.base_url).run(path).data.get()["items"][:limit])
 
     def _scrape_driver(self, path):
-        res = DriverScraper(self.base_url).run(path).data.get()
-        print("{0}".format(res))
+        DriverScraper(self.base_url).run(path).data.get()
 
-    def _scrape_driver_listings(self, path):
+    def _scrape_driver_listings(self, path, should_paginate):
         res = DriverListingScraper(self.base_url).run(path).data.get()
         self.data.concat("driver_listings", res["items"])
-        # handle pagination
-        if res["next_page"] is not None:
+        if should_paginate and res["next_page"] is not None:
             self._scrape_driver_listings(res["next_page"])
