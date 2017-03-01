@@ -29,6 +29,10 @@ class ScraperData(object):
         self._data[key] = val
 
 
+class ScraperResult(object):
+    pass
+
+
 class Scraper(object):
 
     SCRAPER_ID = "Sonical Scraper 1.0 (jonathan@ardent.tech)"
@@ -122,6 +126,7 @@ class DriverScraper(PathScraper):
                 ("voice_coil_wire", "Voice Coil Wire Material", None)]}]
 
     def run(self, path):
+        _data = {}
         tree = self.get_html(path)
 
         for section in self.PATTERNS:
@@ -134,13 +139,14 @@ class DriverScraper(PathScraper):
                     val = scope.xpath(pattern)[0]
                     if post_scrape:
                         val = getattr(self, post_scrape)(val)
-                    self.data.set(key, val)
+                    _data[key] = val
                 except Exception:
                     pass
 
-        # @todo this sucks but will have to do for now
-        self.data.set(
-            "model", self.data.get("model").lstrip(self.data.get("manufacturer")))
+        # special processing
+        _data["model"] = _data["model"].lstrip(_data["manufacturer"])
+
+        self.data.add("items", _data)
         return self
 
     def _to_decimal(self, val):
@@ -204,12 +210,16 @@ class PartsExpressScraper(ModeMixin, DealerScraper):
         for driver_listing in self.data.get("driver_listings"):
             self._scrape_driver(driver_listing["path"])
 
+        # @todo build scraper result
+        return self
+
     def _scrape_categories(self, path, limit):
         self.data.set("categories", CategoryScraper(
             self.base_url).run(path).data.get()["items"][:limit])
 
     def _scrape_driver(self, path):
-        DriverScraper(self.base_url).run(path).data.get()
+        res = DriverScraper(self.base_url).run(path).data.get()
+        self.data.concat("drivers", res["items"])
 
     def _scrape_driver_listings(self, path, should_paginate):
         res = DriverListingScraper(self.base_url).run(path).data.get()
