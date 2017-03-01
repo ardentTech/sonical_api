@@ -13,4 +13,5 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         scrapers = DealerScraper.objects.filter(is_active=True)
         for scraper in scrapers:
-            scraper.run()
+            res = scraper.run()
+            print("{0}".format(res.keys()))

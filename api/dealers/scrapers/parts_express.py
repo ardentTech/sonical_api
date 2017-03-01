@@ -11,6 +11,7 @@ from utils.mixins.mode import ModeMixin
 class ScraperData(object):
 
     def __init__(self):
+        # @todo need a way to handle single dicts (for drivers)
         self._data = {"items": []}
 
     def add(self, key, data):
@@ -27,10 +28,6 @@ class ScraperData(object):
 
     def set(self, key, val):
         self._data[key] = val
-
-
-class ScraperResult(object):
-    pass
 
 
 class Scraper(object):
@@ -53,7 +50,7 @@ class Scraper(object):
 
 class DealerScraper(Scraper):
     """
-    Responsible managing data, coordinating path scrapers and creating a
+    Responsible for managing data, coordinating path scrapers and creating a
     DealerScraperReport.
     """
 
@@ -210,8 +207,7 @@ class PartsExpressScraper(ModeMixin, DealerScraper):
         for driver_listing in self.data.get("driver_listings"):
             self._scrape_driver(driver_listing["path"])
 
-        # @todo build scraper result
-        return self
+        return self.data.get()
 
     def _scrape_categories(self, path, limit):
         self.data.set("categories", CategoryScraper(
