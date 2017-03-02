@@ -8,6 +8,9 @@ import requests
 from utils.mixins.mode import ModeMixin
 
 
+# @todo scrapers as singletons that reset data on each run
+
+
 class ScraperData(object):
 
     def __init__(self):
@@ -197,28 +200,21 @@ class PartsExpressScraper(ModeMixin, DealerScraper):
 
     SEED = "/cat/hi-fi-woofers-subwoofers-midranges-tweeters/13"
 
-    def run(self):
-        category_limit = 1 if self.dev_mode() else None
-        should_paginate = False if self.dev_mode() else True
+    def scrape_categories(self):
+        limit = None if self.pro_mode() else 1
+        return CategoryScraper(self.base_url).run(self.SEED).data.get()["items"][:limit]
 
-        self._scrape_categories(self.SEED, category_limit)
-        for category in self.data.get("categories"):
-            self._scrape_driver_listings(category["path"], should_paginate)
-        for driver_listing in self.data.get("driver_listings"):
-            self._scrape_driver(driver_listing["path"])
+    def scrape_driver_listings(self):
+        data = []
+        for c in self.scrape_categories():
+            self._scrape_driver_listings(data, c["path"])
+        return data
 
-        return self.data.get()
+    def scrape_driver(self, path):
+        return DriverScraper(self.base_url).run(path).data.get()["items"][0]
 
-    def _scrape_categories(self, path, limit):
-        self.data.set("categories", CategoryScraper(
-            self.base_url).run(path).data.get()["items"][:limit])
-
-    def _scrape_driver(self, path):
-        res = DriverScraper(self.base_url).run(path).data.get()
-        self.data.concat("drivers", res["items"])
-
-    def _scrape_driver_listings(self, path, should_paginate):
+    def _scrape_driver_listings(self, data, path):
         res = DriverListingScraper(self.base_url).run(path).data.get()
-        self.data.concat("driver_listings", res["items"])
-        if should_paginate and res["next_page"] is not None:
-            self._scrape_driver_listings(res["next_page"])
+        data += res["items"]
+        if self.pro_mode() and res["next_page"] is not None:
+            self._scrape_driver_listings(data, res["next_page"])

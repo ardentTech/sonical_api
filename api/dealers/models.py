@@ -38,10 +38,10 @@ class DealerScraper(Scraper):
     class Meta:
         verbose_name_plural = "Dealer Scrapers"
 
-    def run(self):
+    def setup(self):
         package = ".".join([os.path.abspath(__file__).split("/")[-2], "scrapers"])
         mod = __import__(package, fromlist=[self.class_name])
-        return getattr(mod, self.class_name)(self).run()
+        return getattr(mod, self.class_name)(self)
 
 
 class DealerScraperReport(ScraperReport):

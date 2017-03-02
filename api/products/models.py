@@ -24,6 +24,6 @@ class ProductListing(Creatable, Modifiable):
         abstract = True
 
     def save(self, *args, **kwargs):
-        if len(self.path) and self.path[0] != os.sep:
+        if self.path[0] != os.sep:
             self.path = os.sep + self.path
         super(ProductListing, self).save(*args, **kwargs)
