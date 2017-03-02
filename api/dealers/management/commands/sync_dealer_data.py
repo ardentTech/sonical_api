@@ -23,16 +23,27 @@ class Command(BaseCommand):
             for listing in scraper.setup().scrape_driver_listings():
                 key = scraper.dealer.website + listing["path"]
                 if key not in self.driver_product_listings:
-                    driver = scraper.setup().scrape_driver(listing["path"])
-                    self._set_manufacturer(driver)
-                    self._set_materials(driver)
                     to_create.append({
-                        "dealer": scraper.dealer, "driver": driver, "listing": listing})
-        self._create_records(to_create)
+                        "driver": scraper.setup().scrape_driver(listing["path"]),
+                        "listing": listing})
+            self._create_records(to_create, scraper.dealer)
 
-    def _create_records(self, records):
-        # create driver product listings
-        Driver.objects.bulk_create([Driver(**r["driver"]) for r in records])
+    def _create_records(self, records, dealer):
+        new_drivers = Driver.objects.bulk_create(
+            [self._format_driver(r["driver"]) for r in records])
+        listings = [self._format_driver_product_listing(
+            r["listing"], new_drivers[id], dealer) for id, r in enumerate(records)]
+        DriverProductListing.objects.bulk_create(listings)
+
+    def _format_driver(self, driver):
+        self._set_manufacturer(driver)
+        self._set_materials(driver)
+        return Driver(**driver)
+
+    def _format_driver_product_listing(self, listing, driver, dealer):
+        listing["driver"] = driver
+        listing["dealer"] = dealer
+        return DriverProductListing(**listing)
 
     def _get_manufacturer(self, name):
         if name and name not in self.manufacturers:
