@@ -2,11 +2,12 @@
 
 from django.core.management.base import BaseCommand
 
-from dealers.models import DealerScraper
+from dealers.models import DealerScraper, DealerScraperReport
 from drivers.models import Driver, DriverProductListing
 from manufacturing.models import Manufacturer, Material
 
 
+# @todo handle exceptions by logging and add to report
 class Command(BaseCommand):
 
     help = "Synchronizes local and remote dealer data"
@@ -20,6 +21,7 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         to_create = []
         for scraper in DealerScraper.objects.filter(is_active=True):
+            self.report = DealerScraperReport(scraper=scraper)
             for listing in scraper.setup().scrape_driver_listings():
                 key = scraper.dealer.website + listing["path"]
                 if key not in self.driver_product_listings:
@@ -27,13 +29,17 @@ class Command(BaseCommand):
                         "driver": scraper.setup().scrape_driver(listing["path"]),
                         "listing": listing})
             self._create_records(to_create, scraper.dealer)
+            self.report.save()
 
     def _create_records(self, records, dealer):
         new_drivers = Driver.objects.bulk_create(
             [self._format_driver(r["driver"]) for r in records])
+        self.report.drivers_created = len(new_drivers)
         listings = [self._format_driver_product_listing(
             r["listing"], new_drivers[id], dealer) for id, r in enumerate(records)]
-        DriverProductListing.objects.bulk_create(listings)
+        # @todo update existing driver product listings
+        new_listings = DriverProductListing.objects.bulk_create(listings)
+        self.report.driver_product_listings_created = len(new_listings)
 
     def _format_driver(self, driver):
         self._set_manufacturer(driver)
@@ -49,12 +55,14 @@ class Command(BaseCommand):
         if name and name not in self.manufacturers:
             m = Manufacturer.objects.create(name=name)
             self.manufacturers[name] = m
+            self.report.manufacturers_created += 1
         return self.manufacturers[name]
 
     def _get_material(self, name):
         if name and name not in self.materials:
             m = Material.objects.create(name=name)
             self.materials[name] = m
+            self.report.materials_created += 1
         return self.materials[name]
 
     def _set_manufacturer(self, driver):
