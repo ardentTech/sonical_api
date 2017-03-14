@@ -26,6 +26,7 @@ def get_env_var(name):
             raise ImproperlyConfigured(
                 "The {0} environment variable must be defined.".format(name))
 
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(
     os.path.abspath(__file__))))
@@ -162,3 +163,33 @@ REST_FRAMEWORK = {
 AUTH_USER_MODEL = "users.User"
 
 SONICAL_DEFAULT_PASSWORD = get_env_var("SONICAL_DEFAULT_PASSWORD")
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s"
+        }
+    },
+    "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+        "file": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": os.path.join(BASE_DIR, "app.log"),
+            "formatter": "verbose",
+        }
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console", "file"],
+            "level": "DEBUG",
+            "propagate": True,
+        }
+    }
+}

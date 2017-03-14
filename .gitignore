@@ -1,3 +1,4 @@
 *.pyc
 *.swp
 api/conf.py
+api/app.log

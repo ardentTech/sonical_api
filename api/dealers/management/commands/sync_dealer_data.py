@@ -1,4 +1,4 @@
-# from decimal import Decimal
+import logging
 
 from django.core.management.base import BaseCommand
 
@@ -7,7 +7,9 @@ from drivers.models import Driver, DriverProductListing
 from manufacturing.models import Manufacturer, Material
 
 
-# @todo handle exceptions by logging and add to report
+logger = logging.getLogger(__name__)
+
+
 class Command(BaseCommand):
 
     help = "Synchronizes local and remote dealer data"
@@ -19,17 +21,20 @@ class Command(BaseCommand):
         super(Command, self).__init__(*args, **kwargs)
 
     def handle(self, *args, **kwargs):
-        to_create = []
-        for scraper in DealerScraper.objects.filter(is_active=True):
-            self.report = DealerScraperReport(scraper=scraper)
-            for listing in scraper.setup().scrape_driver_listings():
-                key = scraper.dealer.website + listing["path"]
-                if key not in self.driver_product_listings:
-                    to_create.append({
-                        "driver": scraper.setup().scrape_driver(listing["path"]),
-                        "listing": listing})
-            self._create_records(to_create, scraper.dealer)
-            self.report.save()
+        try:
+            to_create = []
+            for scraper in DealerScraper.objects.filter(is_active=True):
+                self.report = DealerScraperReport(scraper=scraper)
+                for listing in scraper.setup().scrape_driver_listings():
+                    key = scraper.dealer.website + listing["path"]
+                    if key not in self.driver_product_listings:
+                        to_create.append({
+                            "driver": scraper.setup().scrape_driver(listing["path"]),
+                            "listing": listing})
+                self._create_records(to_create, scraper.dealer)
+                self.report.save()
+        except Exception as e:
+            logger.exception(repr(e))
 
     def _create_records(self, records, dealer):
         new_drivers = Driver.objects.bulk_create(
