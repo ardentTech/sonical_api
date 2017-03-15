@@ -167,6 +167,14 @@ SONICAL_DEFAULT_PASSWORD = get_env_var("SONICAL_DEFAULT_PASSWORD")
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
+    "filters": {
+        "require_debug_false": {
+            "()": "django.utils.log.RequireDebugFalse",
+        },
+        "require_debug_true": {
+            "()": "django.utils.log.RequireDebugTrue",
+        },
+    },
     "formatters": {
         "color": {
             "()": "colorlog.ColoredFormatter",
@@ -194,13 +202,21 @@ LOGGING = {
             "class": "logging.FileHandler",
             "filename": os.path.join(BASE_DIR, "app.log"),
             "formatter": "verbose",
+        },
+        "mail_admins": {
+            "level": "ERROR",
+            "filters": ["require_debug_false"],
+            "class": "django.utils.log.AdminEmailHandler",
         }
     },
     "loggers": {
         "django": {
-            "handlers": ["console", "file"],
-            "level": "DEBUG",
-            "propagate": True,
+            "handlers": ["console", "file", "mail_admins"],
+            "level": "DEBUG"
+        },
+        "": {
+            "handlers": ["console", "file", "mail_admins"],
+            "level": "DEBUG"
         }
     }
 }

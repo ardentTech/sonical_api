@@ -17,8 +17,8 @@ class ProductListing(Creatable, Modifiable):
     price = models.DecimalField(max_digits=8, decimal_places=2)
 
     @property
-    def listing_url(self):
-        return "".join(self.dealer.website, self.path)
+    def url(self):
+        return "".join([self.dealer.website, self.path])
 
     class Meta:
         abstract = True

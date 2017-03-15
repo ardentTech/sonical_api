@@ -220,6 +220,3 @@ class DriverProductListing(ProductListing):
 
     def __str__(self):
         return "{0} {1}".format(self.dealer.name, self.driver.model)
-
-    def url(self):
-        return "{0}".format(self.dealer.website + self.path)

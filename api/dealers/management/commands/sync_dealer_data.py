@@ -22,8 +22,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         try:
-            to_create = []
             for scraper in DealerScraper.objects.filter(is_active=True):
+                to_create = []
+                to_update = []
                 self.report = DealerScraperReport(scraper=scraper)
                 for listing in scraper.setup().scrape_driver_listings():
                     key = scraper.dealer.website + listing["path"]
@@ -31,7 +32,11 @@ class Command(BaseCommand):
                         to_create.append({
                             "driver": scraper.setup().scrape_driver(listing["path"]),
                             "listing": listing})
+                    else:
+                        listing["url"] = key
+                        to_update.append(listing)
                 self._create_records(to_create, scraper.dealer)
+                self._update_listings(to_update)
                 self.report.save()
         except Exception as e:
             logger.exception(repr(e))
@@ -42,7 +47,6 @@ class Command(BaseCommand):
         self.report.drivers_created = len(new_drivers)
         listings = [self._format_driver_product_listing(
             r["listing"], new_drivers[id], dealer) for id, r in enumerate(records)]
-        # @todo update existing driver product listings
         new_listings = DriverProductListing.objects.bulk_create(listings)
         self.report.driver_product_listings_created = len(new_listings)
 
@@ -79,10 +83,18 @@ class Command(BaseCommand):
                 driver[m] = self._get_material(driver[m])
 
     def _setup_driver_product_listings(self):
-        return {dpl.url(): dpl for dpl in DriverProductListing.objects.all()}
+        return {dpl.url: dpl for dpl in DriverProductListing.objects.all()}
 
     def _setup_manufacturers(self):
         return {m.name: m for m in Manufacturer.objects.all()}
 
     def _setup_materials(self):
         return {m.name: m for m in Material.objects.all()}
+
+    def _update_listings(self, listings):
+        for listing in listings:
+            dpl = self.driver_product_listings[listing["url"]]
+            if dpl.price != listing["price"]:
+                dpl.price = listing["price"]
+                dpl.save()  # @todo use a bulk_update eventually
+                self.report.driver_product_listings_updated += 1

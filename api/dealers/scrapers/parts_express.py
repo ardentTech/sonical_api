@@ -187,7 +187,8 @@ class DriverListingScraper(PathScraper):
         for listing in tree.xpath(self.PATTERNS["listing"]["scope"]):
             self.data.add("items", {
                 "path": listing.xpath(self.PATTERNS["listing"]["path"])[0],
-                "price": listing.xpath(self.PATTERNS["listing"]["price"])[0].lstrip("$")
+                "price": Decimal(
+                    listing.xpath(self.PATTERNS["listing"]["price"])[0].lstrip("$"))
             })
         try:
             self.data.set("next_page", tree.xpath(self.PATTERNS["next_page"])[0])
