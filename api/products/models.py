@@ -14,7 +14,12 @@ class ProductListing(Creatable, Modifiable):
     path = models.CharField(
         _("path"),
         max_length=128)
-    price = models.DecimalField(max_digits=8, decimal_places=2)
+    price = models.DecimalField(
+        _("price"),
+        blank=True,
+        max_digits=8,
+        null=True,
+        decimal_places=2)
 
     @property
     def url(self):
