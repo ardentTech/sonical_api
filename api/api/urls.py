@@ -19,6 +19,7 @@ from django.contrib import admin
 from rest_framework import routers
 
 from drivers.views import DriverViewSet, DriverGroupViewSet
+from manufacturing.views import ManufacturerViewSet, MaterialViewSet
 
 router = routers.DefaultRouter()
 router.register(
@@ -29,6 +30,14 @@ router.register(
     r"drivers/groups",
     DriverGroupViewSet,
     base_name="drivergroup")
+router.register(
+    r"manufacturers",
+    ManufacturerViewSet,
+    base_name="manufacturer")
+router.register(
+    r"materials",
+    MaterialViewSet,
+    base_name="material")
 
 urlpatterns = [
     url(r"^v1/", include(router.urls, namespace="api")),
