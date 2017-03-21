@@ -12,13 +12,13 @@ class Driver(Creatable, Modifiable):
         _("BL Product (Tm)"),
         blank=True,
         decimal_places=2,
-        max_digits=5,
+        max_digits=7,
         null=True)
     compliance_equivalent_volume = models.DecimalField(
         _("Compliance Equivalent Volume (ft**3)"),
         blank=True,
         decimal_places=2,
-        max_digits=5,
+        max_digits=7,
         null=True)
     basket_frame = models.ForeignKey(
         "manufacturing.Material",
@@ -36,25 +36,25 @@ class Driver(Creatable, Modifiable):
         _("Surface Area of Cone (cm**2)"),
         blank=True,
         decimal_places=2,
-        max_digits=5,
+        max_digits=7,
         null=True)
     dc_resistance = models.DecimalField(
         _("DC Resistance (ohms)"),
         blank=True,
         decimal_places=2,
-        max_digits=5,
+        max_digits=7,
         null=True)
     diaphragm_mass_including_airload = models.DecimalField(
         _("Diaphragm Mass Inc. Airload (g)"),
         blank=True,
         decimal_places=2,
-        max_digits=5,
+        max_digits=7,
         null=True)
     electromagnetic_q = models.DecimalField(
         _("Electromagnetic Q"),
         blank=True,
         decimal_places=2,
-        max_digits=5,
+        max_digits=7,
         null=True)
     frequency_response = IntegerRangeField(
         _("Frequency Response (Hz)"),
@@ -79,19 +79,19 @@ class Driver(Creatable, Modifiable):
         _("Maximum Linear Excursion (mm)"),
         blank=True,
         decimal_places=2,
-        max_digits=5,
+        max_digits=7,
         null=True)
     mechanical_compliance_of_suspension = models.DecimalField(
         _("Mechanical Compliance of Suspension (mm/N)"),
         blank=True,
         decimal_places=2,
-        max_digits=5,
+        max_digits=7,
         null=True)
     mechanical_q = models.DecimalField(
         _("Mechanical Q"),
         blank=True,
         decimal_places=2,
-        max_digits=5,
+        max_digits=7,
         null=True)
     model = models.CharField(
         _("Model"),
@@ -101,7 +101,7 @@ class Driver(Creatable, Modifiable):
         _("Nominal Diameter (Inches)"),
         blank=True,
         decimal_places=2,
-        max_digits=5,
+        max_digits=7,
         null=True)
     nominal_impedance = models.IntegerField(
         _("Nominal Impedance (Ohms)"),
@@ -123,7 +123,7 @@ class Driver(Creatable, Modifiable):
         blank=True,
         decimal_places=2,
         help_text="2.83V/1m",
-        max_digits=5,
+        max_digits=7,
         null=True)
     surround = models.ForeignKey(
         "manufacturing.Material",
@@ -135,7 +135,7 @@ class Driver(Creatable, Modifiable):
         _("Voice Coil Diameter (Inches)"),
         blank=True,
         decimal_places=2,
-        max_digits=5,
+        max_digits=7,
         null=True)
     voice_coil_former = models.ForeignKey(
         "manufacturing.Material",
@@ -147,7 +147,7 @@ class Driver(Creatable, Modifiable):
         _("Voice Coil Inductance (MilliHenries)"),
         blank=True,
         decimal_places=2,
-        max_digits=5,
+        max_digits=7,
         null=True)
     voice_coil_wire = models.ForeignKey(
         "manufacturing.Material",

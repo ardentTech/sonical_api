@@ -8,7 +8,7 @@ from utils.filter_fields import SonicalBooleanFilter
 class DriverFilter(django_filters.FilterSet):
 
     in_production = SonicalBooleanFilter()
-    manufacturer = django_filters.CharFilter(name="manufacturer__name")
+#    manufacturer = django_filters.CharFilter(name="manufacturer__name")
 
     class Meta:
         fields = [
