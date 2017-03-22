@@ -6,10 +6,6 @@ CORS_ORIGIN_WHITELIST = ("sonical.ardent.tech",)
 
 DEBUG = False
 
-REST_FRAMEWORK = {
-    "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",)        
-}
-
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = get_env_var("SONICAL_EMAIL_HOST")
 EMAIL_HOST_PASSWORD = get_env_var("SONICAL_EMAIL_HOST_PASSWORD")
