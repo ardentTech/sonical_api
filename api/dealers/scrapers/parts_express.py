@@ -14,7 +14,6 @@ from utils.mixins.mode import ModeMixin
 class ScraperData(object):
 
     def __init__(self):
-        # @todo need a way to handle single dicts (for drivers)
         self._data = {"items": []}
 
     def add(self, key, data):
@@ -170,7 +169,7 @@ class DriverScraper(PathScraper):
 
     def _to_frequency_response(self, val):
         parts = val.replace(",", "").split(" ")
-        return (Decimal(parts[0]), Decimal(parts[2]))
+        return (int(round(parts[0])), int(round(parts[2])))
 
 
 class DriverListingScraper(PathScraper):
