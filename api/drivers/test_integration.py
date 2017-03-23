@@ -60,7 +60,7 @@ class DriverListFilterTestCase(BaseAPITestCase):
         DriverFactory.create(manufacturer=markaudio)
 
         response = self.client.get(
-            reverse("api:driver-list") + "?manufacturer=MarkAudio")
+            reverse("api:driver-list") + "?manufacturer={0}".format(markaudio.id))
         self.assert_get_ok(response, count=1)
 
     def test_get_max_power_ok(self):
