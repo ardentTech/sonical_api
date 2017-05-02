@@ -8,6 +8,12 @@ from utils.models import Creatable, Modifiable
 
 class Driver(Creatable, Modifiable):
 
+    basket_frame = models.ForeignKey(
+        "manufacturing.Material",
+        blank=True,
+        null=True,
+        related_name="driver_basket_frame",
+        verbose_name=_("basket frame"))
     bl_product = models.DecimalField(
         _("BL Product (Tm)"),
         blank=True,
@@ -20,12 +26,6 @@ class Driver(Creatable, Modifiable):
         decimal_places=2,
         max_digits=7,
         null=True)
-    basket_frame = models.ForeignKey(
-        "manufacturing.Material",
-        blank=True,
-        null=True,
-        related_name="driver_basket_frame",
-        verbose_name=_("basket frame"))
     cone = models.ForeignKey(
         "manufacturing.Material",
         blank=True,
@@ -71,15 +71,15 @@ class Driver(Creatable, Modifiable):
         verbose_name=_("magnet"))
     manufacturer = models.ForeignKey(
         "manufacturing.Manufacturer")
-    max_power = models.IntegerField(
-        _("Max Power (Watts)"),
-        blank=True,
-        null=True)
     max_linear_excursion = models.DecimalField(
         _("Maximum Linear Excursion (mm)"),
         blank=True,
         decimal_places=2,
         max_digits=7,
+        null=True)
+    max_power = models.IntegerField(
+        _("Max Power (Watts)"),
+        blank=True,
         null=True)
     mechanical_compliance_of_suspension = models.DecimalField(
         _("Mechanical Compliance of Suspension (mm/N)"),

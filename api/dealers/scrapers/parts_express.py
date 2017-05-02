@@ -8,6 +8,7 @@ import requests
 from utils.mixins.mode import ModeMixin
 
 
+# @todo convert fractional nominal diameter to decimal
 # @todo scrapers as singletons that reset data on each run
 
 
