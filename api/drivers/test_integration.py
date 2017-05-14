@@ -6,6 +6,18 @@ from users.factories import UserFactory
 from utils.testing import BaseAPITestCase
 
 
+class DriverDetailTestCase(BaseAPITestCase):
+
+    def test_get_object_not_found(self):
+        response = self.client.get(reverse("api:driver-detail", kwargs={"pk": 0}))
+        self.assert_not_found(response)
+
+    def test_get_object_ok(self):
+        pk = DriverFactory.create().pk
+        response = self.client.get(reverse("api:driver-detail", kwargs={"pk": pk}))
+        self.assert_get_ok(response)
+
+
 class DriverListTestCase(BaseAPITestCase):
 
     def test_get_ok(self):
@@ -14,17 +26,6 @@ class DriverListTestCase(BaseAPITestCase):
 
         response = self.client.get(reverse("api:driver-list"))
         self.assert_get_ok(response, count=3)
-
-
-class DriverListSearchTestCase(BaseAPITestCase):
-
-    def test_get_model_ok(self):
-        DriverFactory.create(model="Alpair 6M")
-        DriverFactory.create(model="Pluvia Eleven")
-
-        response = self.client.get(
-            reverse("api:driver-list") + "?search=pluv")
-        self.assert_get_ok(response, count=1)
 
 
 class DriverListFilterTestCase(BaseAPITestCase):

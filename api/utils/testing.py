@@ -14,6 +14,9 @@ class BaseAPITestCase(APITestCase):
         if count > 0:
             self.assertEqual(self.get_content(response)["count"], count)
 
+    def assert_not_found(self, response, **kwargs):
+        self.assertEqual(response.status_code, 404)
+
     def assert_post_ok(self, response, **kwargs):
         self.assertEqual(response.status_code, 201)
 

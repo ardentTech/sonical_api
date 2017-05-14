@@ -23,13 +23,13 @@ from manufacturing.views import ManufacturerViewSet, MaterialViewSet
 
 router = routers.DefaultRouter()
 router.register(
+    r"driver/groups",
+    DriverGroupViewSet,
+    base_name="drivergroup")
+router.register(
     r"drivers",
     DriverViewSet,
     base_name="driver")
-router.register(
-    r"drivers/groups",
-    DriverGroupViewSet,
-    base_name="drivergroup")
 router.register(
     r"manufacturers",
     ManufacturerViewSet,

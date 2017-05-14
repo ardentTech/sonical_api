@@ -6,12 +6,11 @@ from .models import Driver, DriverGroup
 from .serializers import DriverSerializer, DriverGroupSerializer
 
 
-class DriverViewSet(mixins.ListModelMixin, GenericViewSet):
+class DriverViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, GenericViewSet):
 
     filter_class = DriverFilter
     ordering_fields = ()
     queryset = Driver.objects.all()
-    search_fields = ("model",)
     serializer_class = DriverSerializer
 
 
