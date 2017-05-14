@@ -17,7 +17,7 @@ class DriverFilter(django_filters.FilterSet):
             "manufacturer": ["exact"],
             "max_power": ["exact", "gt", "gte", "lt", "lte"],
             "mechanical_q": ["exact", "gt", "gte", "lt", "lte"],
-            "model": ["contains"],
+            "model": ["contains", "icontains"],
             "nominal_diameter": ["exact", "gt", "gte", "lt", "lte"],
             "nominal_impedance": ["exact", "gt", "gte", "lt", "lte"],
             "resonant_frequency": ["exact", "gt", "gte", "lt", "lte"],

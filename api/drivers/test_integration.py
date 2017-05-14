@@ -79,13 +79,20 @@ class DriverListFilterTestCase(BaseAPITestCase):
             reverse("api:driver-list") + "?mechanical_q=2.00")
         self.assert_get_ok(response, count=1)
 
-    def test_get_model_ok(self):
+    def test_get_model_case_sensitive_ok(self):
         DriverFactory.create(model="Pluvia")
         DriverFactory.create(model="Testing")
 
-        # @todo this is exact and case-sensitive. loosen those restrictions.
         response = self.client.get(
-            reverse("api:driver-list") + "?model=Testing")
+            reverse("api:driver-list") + "?model__contains=Testing")
+        self.assert_get_ok(response, count=1)
+
+    def test_get_model_not_case_sensitive_ok(self):
+        DriverFactory.create(model="Pluvia")
+        DriverFactory.create(model="Testing")
+
+        response = self.client.get(
+            reverse("api:driver-list") + "?model__icontains=testing")
         self.assert_get_ok(response, count=1)
 
     def test_get_nominal_diameter_ok(self):
