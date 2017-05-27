@@ -1,4 +1,5 @@
 import logging
+import time
 
 from django.core.management.base import BaseCommand
 
@@ -23,6 +24,7 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         try:
             for scraper in DealerScraper.objects.filter(is_active=True):
+                start_time = time.time()
                 to_create = []
                 to_update = []
                 self.report = DealerScraperReport(scraper=scraper)
@@ -37,6 +39,7 @@ class Command(BaseCommand):
                         to_update.append(listing)
                 self._create_records(to_create, scraper.dealer)
                 self._update_listings(to_update)
+                self.report.execution_time = round(time.time() - start_time)
                 self.report.save()
         except Exception as e:
             logger.exception(repr(e))

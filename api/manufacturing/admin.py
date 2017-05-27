@@ -19,6 +19,7 @@ class ManufacturerAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "name",
+        "website",
         "created",
         "modified",
     )

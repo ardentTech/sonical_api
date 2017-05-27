@@ -61,6 +61,7 @@ class DealerScraperReportAdmin(admin.ModelAdmin):
                 "drivers_created",
                 "driver_product_listings_created",
                 "driver_product_listings_updated",
+                "execution_time",
                 "errors",
                 "manufacturers_created",
                 "materials_created",
@@ -75,6 +76,7 @@ class DealerScraperReportAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "scraper",
+        "execution_time",
         "drivers_created",
         "driver_product_listings_created",
         "driver_product_listings_updated",

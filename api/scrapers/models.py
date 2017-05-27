@@ -23,7 +23,7 @@ class Scraper(Creatable, Modifiable):
 
 class ScraperReport(Creatable):
 
-    # @todo execution_time in milliseconds
+    execution_time = models.PositiveSmallIntegerField(_("Execution Time (Seconds)"))
 
     class Meta:
         abstract = True
