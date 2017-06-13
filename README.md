@@ -5,9 +5,9 @@
 * PostgreSQL >= 9.6.0
 
 ## Setup
-`$ mkdir ~/.venv && cd ~/.venv`
-`$ python3.6 -m venv sonical && source sonical/bin/activate`
-`$ pip install -r requirements.txt`
+1) `$ mkdir ~/.venv && cd ~/.venv`
+2) `$ python3.6 -m venv sonical && source sonical/bin/activate`
+3) `$ pip install -r requirements.txt`
 
 ## Test
 `$ ./bin/do test`
